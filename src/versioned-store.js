@@ -21,7 +21,14 @@ export default class VersionedStore {
    * @param {string} name
    */
   get(name) {
-    
+    this._assertValidProperty(name);
+
+    if (this._data.hasOwnProperty(name)) {
+      return this._data[name];
+    }
+    else {
+      return this._defaultValue;
+    }
   }
 
   /**
@@ -30,7 +37,13 @@ export default class VersionedStore {
    * @param value
    */
   set(name, value) {
+    this._assertValidProperty(name);
+    
+    if (this._data.hasOwnProperty(name)) {
+      this._changes[name] = this._data[name];
+    }
 
+    this._data[name] = value;
   }
 
   /**
@@ -67,5 +80,11 @@ export default class VersionedStore {
    */
   clearChanges() {
     this._changes = {};
+  }
+
+  _assertValidProperty(name) {
+    if (this._validProperties && !this._validProperties.has(name)) {
+      throw new Error("Cannot retrieve property '" + name + "'");
+    }
   }
 }
