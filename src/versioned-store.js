@@ -34,17 +34,38 @@ export default class VersionedStore {
   }
 
   /**
+   * Retrieves a list of the names of the properties that have changed
+   */
+  getChangedPropertyNames() {
+    return Object.keys(this._changes);
+  }
+  
+  /**
    * Retrieves an object containing the name and old value
    * of each property that has been changed
    */
-  getChanges() {
+  getChangedOldValues() {
+    return this._changes;
+  }
 
+  /**
+   * Retrieves an object containing the name and current values
+   * of each property that has been changed
+   */
+  getChangedCurrentValues() {
+    const changed = {};
+
+    for (let propName of this._changes) {
+      changed[propName] = this.get(propName);
+    }
+
+    return changed;
   }
 
   /**
    * Clears out any recorded changes
    */
   clearChanges() {
-
+    this._changes = {};
   }
 }
