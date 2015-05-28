@@ -1,6 +1,8 @@
 const events = require('events');
 
+const GameConstants = require('./game-constants');
 const KnockGame = require('./knock-game');
+const VersionedStore = require('./versioned-store');
 
 const STATE_UPDATE_CURRENT_GAME = "game";
 
@@ -10,6 +12,9 @@ export default class Sculpture extends events.EventEmitter {
 
     // Temporarily here to make the knock game work
     this.currentGame = new KnockGame();
+
+    this.store = new VersionedStore({
+    });
   }
 
   get currentGame() {
@@ -49,7 +54,12 @@ export default class Sculpture extends events.EventEmitter {
     }
   }
 
-  _handleGameUpdate() {
-    
+  _handleGameUpdate(update) {
+    const thisUpdate = this.store.getChangedCurrentValues();
+    this.store.clearChanges();
+
+    this.emit(GameConstants.EVENT_UPDATE, Object.assign({}, thisUpdate, {
+      [STATE_UPDATE_CURRENT_GAME]: update
+    }));
   }
 }

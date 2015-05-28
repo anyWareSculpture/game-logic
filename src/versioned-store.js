@@ -50,7 +50,7 @@ export default class VersionedStore {
    * of each property that has been changed
    */
   getChangedOldValues() {
-    return this._changes;
+    return Object.assign({}, this._changes);
   }
 
   /**

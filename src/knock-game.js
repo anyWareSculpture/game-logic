@@ -1,5 +1,6 @@
 const events = require('events');
 
+const GameConstants = require('./game-constants');
 const VersionedStore = require('./versioned-store');
 const AsyncDelay = require('./async-delay');
 
@@ -19,27 +20,31 @@ export default class KnockGame extends events.EventEmitter {
 
     this._delay = null;
 
-    this.store = new VersionedStore([]);
+    this.store = new VersionedStore({
+      knocking: false
+    });
   }
 
   onFrame() {
-    if (this._delay && this._delay.is_active) {
-      return;
+    this.store.set("knocking", false);
+
+    if (!(this._delay && this._delay.is_active)) {
+      this.produceKnock();
+      this._targetPatternPosition += 1;
+
+      let delay;
+      if (this._targetPatternPosition < this._targetPattern.length) {
+        delay = this._targetPattern[this._targetPatternPosition];
+      }
+      else {
+        delay = TIME_OFFSET_BETWEEN_CYCLES;
+        this._targetPatternPosition = 0;
+      }
+
+      this._delay = new AsyncDelay(delay);
     }
 
-    this.produceKnock();
-    this._targetPatternPosition += 1;
-
-    let delay;
-    if (this._targetPatternPosition < this._targetPattern.length) {
-      delay = this._targetPattern[this._targetPatternPosition];
-    }
-    else {
-      delay = TIME_OFFSET_BETWEEN_CYCLES;
-      this._targetPatternPosition = 0;
-    }
-
-    this._delay = new AsyncDelay(delay);
+    this.emitStateUpdate();
   }
 
   mergeUpdate(update) {
@@ -51,6 +56,12 @@ export default class KnockGame extends events.EventEmitter {
   }
 
   produceKnock() {
-    console.log(`knock ${this._targetPatternPosition}`);
+    this.store.set("knocking", true);
+  }
+
+  emitStateUpdate() {
+    const changed = this.store.getChangedCurrentValues();
+    this.store.clearChanges();
+    this.emit(GameConstants.EVENT_UPDATE, changed);
   }
 }
