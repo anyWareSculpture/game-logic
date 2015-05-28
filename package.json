@@ -1,6 +1,6 @@
 {
   "name": "@anyware/game-logic",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Game logic for anyWare",
   "main": "src/sculpture.js",
   "directories": {
