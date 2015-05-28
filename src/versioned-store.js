@@ -2,18 +2,15 @@ export default class VersionedStore {
   /**
    * Data store that keeps track of the last properties that were changed
    * @constructor
-   * @param {Set} [validProperties=null] - A list of properties which if
-   *    provided will be enforced as the only valid properties for this store
-   * @param [defaultValue=null] - The default value to provide for a valid property not provided
+   * @param {Object} [validProperties=null] - An object containing valid property names as keys and that property's default value as values
    */
-  constructor(validProperties=null, defaultValue=null) {
-    this._data = {};
+  constructor(validProperties=null) {
+    this._data = Object.assign({}, validProperties || {});
     
     // {changedProperty: oldValue, ...}
     this._changes = {};
 
-    this._validProperties = validProperties;
-    this._defaultValue = defaultValue;
+    this._validPropertiesNames = new Set(Object.keys(validProperties));
   }
   
   /**
@@ -23,12 +20,7 @@ export default class VersionedStore {
   get(name) {
     this._assertValidProperty(name);
 
-    if (this._data.hasOwnProperty(name)) {
-      return this._data[name];
-    }
-    else {
-      return this._defaultValue;
-    }
+    return this._data[name];
   }
 
   /**
@@ -83,7 +75,7 @@ export default class VersionedStore {
   }
 
   _assertValidProperty(name) {
-    if (this._validProperties && !this._validProperties.has(name)) {
+    if (this._validPropertiesNames && !this._validPropertiesNames.has(name)) {
       throw new Error("Cannot retrieve property '" + name + "'");
     }
   }
