@@ -9,8 +9,11 @@ export default class VersionedStore {
     
     // {changedProperty: oldValue, ...}
     this._changes = {};
-
-    this._validPropertiesNames = new Set(Object.keys(validProperties));
+    
+    this._validPropertiesNames = null;
+    if (validProperties) {
+      this._validPropertiesNames = new Set(Object.keys(validProperties));
+    }
   }
   
   /**
@@ -60,7 +63,7 @@ export default class VersionedStore {
   getChangedCurrentValues() {
     const changed = {};
 
-    for (let propName of this._changes) {
+    for (let propName of Object.keys(this._changes)) {
       changed[propName] = this.get(propName);
     }
 
