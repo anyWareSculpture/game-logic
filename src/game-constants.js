@@ -1,3 +1,3 @@
-export default const GameConstants = {
+export default {
   EVENT_UPDATE: 'update'
 };
