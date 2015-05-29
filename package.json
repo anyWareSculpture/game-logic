@@ -2,7 +2,7 @@
   "name": "@anyware/game-logic",
   "version": "1.0.0",
   "description": "Game logic for anyWare",
-  "main": "src/sculpture.js",
+  "main": "src/index.js",
   "directories": {
     "test": "test"
   },
