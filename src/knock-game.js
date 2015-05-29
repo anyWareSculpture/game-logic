@@ -25,6 +25,11 @@ export default class KnockGame extends events.EventEmitter {
     });
   }
 
+  // Store properties
+  get isKnocking() {
+    return this.store.get("knocking");
+  }
+
   onFrame() {
     this.store.set("knocking", false);
 
