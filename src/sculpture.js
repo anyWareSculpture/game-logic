@@ -8,6 +8,8 @@ const STATE_UPDATE_CURRENT_GAME = "game";
 
 export default class Sculpture extends events.EventEmitter {
   constructor() {
+    super();
+
     this._currentGame = null;
 
     // Temporarily here to make the knock game work
