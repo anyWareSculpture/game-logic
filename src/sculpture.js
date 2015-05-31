@@ -45,10 +45,6 @@ export default class Sculpture extends events.EventEmitter {
 
   set currentGame(game) {
     this._currentGame = game;
-
-    if (this._currentGame) {
-      this._currentGame.on(GameConstants.EVENT_UPDATE, this._handleGameUpdate);
-    }
   }
 
   get isPlayingKnockGame() {
