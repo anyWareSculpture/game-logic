@@ -85,12 +85,12 @@ export default class Sculpture extends events.EventEmitter {
     if (this.currentGame) {
       const gameUpdate = this.currentGame.store.getChangedCurrentValues();
       this.currentGame.store.clearChanges();
-      
+
       if (Object.keys(gameUpdate).length) {
         thisUpdate[STATE_UPDATE_CURRENT_GAME] = gameUpdate;
       }
     }
-    
+
     if (Object.keys(thisUpdate).length) {
       this.emit(GameConstants.EVENT_UPDATE, thisUpdate);
     }

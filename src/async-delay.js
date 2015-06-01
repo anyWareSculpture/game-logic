@@ -5,16 +5,16 @@ export default class AsyncDelay {
    * @param {Number} delayLength - The length of the delay in milliseconds
    */
   constructor(delayLength) {
-    this._delay_active = true;
+    this._delayActive = true;
 
     setTimeout(() => this._endDelay(), delayLength);
   }
 
-  get is_active() {
-    return this._delay_active;
+  get isActive() {
+    return this._delayActive;
   }
 
   _endDelay() {
-    this._delay_active = false;
+    this._delayActive = false;
   }
 }

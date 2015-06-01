@@ -6,19 +6,20 @@ export default class VersionedStore {
    */
   constructor(validProperties=null) {
     this._data = Object.assign({}, validProperties || {});
-    
+
     // {changedProperty: oldValue, ...}
     this._changes = {};
-    
+
     this._validPropertiesNames = null;
     if (validProperties) {
       this._validPropertiesNames = new Set(Object.keys(validProperties));
     }
   }
-  
+
   /**
    * Gets a copy of the value associated with the given name
-   * @param {string} name
+   * @param {string} name - The name of the property to retrieve
+   * @returns {*} a copy of the value of name
    */
   get(name) {
     this._assertValidProperty(name);
@@ -28,12 +29,12 @@ export default class VersionedStore {
 
   /**
    * Stores the given value and tracks its old value as changed
-   * @param {string} name
-   * @param value
+   * @param {string} name - The name of the property to set
+   * @param {*} value - The value to store
    */
   set(name, value) {
     this._assertValidProperty(name);
-    
+
     if (this._data.hasOwnProperty(name)) {
       this._changes[name] = this._data[name];
     }
@@ -43,14 +44,16 @@ export default class VersionedStore {
 
   /**
    * Retrieves a list of the names of the properties that have changed
+   * @returns {String[]} - The list of names
    */
   getChangedPropertyNames() {
     return Object.keys(this._changes);
   }
-  
+
   /**
    * Retrieves an object containing the name and old value
    * of each property that has been changed
+   * @returns {Object} - Object where keys are the names of each changed property and values are the previous value of that property
    */
   getChangedOldValues() {
     return Object.assign({}, this._changes);
@@ -59,6 +62,7 @@ export default class VersionedStore {
   /**
    * Retrieves an object containing the name and current values
    * of each property that has been changed
+   * @returns {Object} - Object where keys are the names of each changed property and the values are the current value of that property
    */
   getChangedCurrentValues() {
     const changed = {};

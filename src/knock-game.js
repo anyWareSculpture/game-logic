@@ -1,4 +1,3 @@
-const GameConstants = require('./game-constants');
 const VersionedStore = require('./versioned-store');
 const AsyncDelay = require('./async-delay');
 
@@ -29,7 +28,7 @@ export default class KnockGame {
   onFrame() {
     this.store.set("knocking", false);
 
-    if (!(this._delay && this._delay.is_active)) {
+    if (!(this._delay && this._delay.isActive)) {
       this.produceKnock();
       this._targetPatternPosition += 1;
 
@@ -47,13 +46,16 @@ export default class KnockGame {
   }
 
   mergeUpdate(update) {
-
+    //TODO
   }
 
-  receiveKnock() {
-    
+  userKnock() {
+    //TODO: Process a knock from the user
   }
-
+  
+  /**
+   * Output a knock to the user
+   */
   produceKnock() {
     this.store.set("knocking", true);
   }
