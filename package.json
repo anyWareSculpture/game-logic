@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/anyWareSculpture/game-logic",
   "devDependencies": {
-    "babel": "^5.4.7"
+    "@anyware/gulp-utils": "^1.0.6",
+    "babel": "^5.4.7",
+    "gulp": "^3.8.11",
+    "run-sequence": "^1.1.0"
   }
 }
