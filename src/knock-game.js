@@ -1,5 +1,3 @@
-const events = require('events');
-
 const GameConstants = require('./game-constants');
 const VersionedStore = require('./versioned-store');
 const AsyncDelay = require('./async-delay');
@@ -11,10 +9,8 @@ const KNOCK_PATTERN = KNOCK_PATTERNS.shaveAndHaircut;
 
 const TIME_OFFSET_BETWEEN_CYCLES = 5000; // ms
 
-export default class KnockGame extends events.EventEmitter {
+export default class KnockGame {
   constructor() {
-    super();
-
     this._targetPattern = KNOCK_PATTERN;
     this._targetPatternPosition = 0;
 
@@ -48,8 +44,6 @@ export default class KnockGame extends events.EventEmitter {
 
       this._delay = new AsyncDelay(delay);
     }
-
-    this.emitStateUpdate();
   }
 
   mergeUpdate(update) {
@@ -62,11 +56,5 @@ export default class KnockGame extends events.EventEmitter {
 
   produceKnock() {
     this.store.set("knocking", true);
-  }
-
-  emitStateUpdate() {
-    const changed = this.store.getChangedCurrentValues();
-    this.store.clearChanges();
-    this.emit(GameConstants.EVENT_UPDATE, changed);
   }
 }
