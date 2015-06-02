@@ -6,7 +6,11 @@ const DataChangeTracker = require('./data-change-tracker');
 const KNOCK_PATTERNS = {
   shaveAndHaircut: [0, 447, 318, 152, 450]
 };
+const KNOCK_PATTERNS_SOLUTION_THRESHOLDS = {
+  shaveAndHaircut: [[800, 1600], [400, 600]]
+};
 const KNOCK_PATTERN = KNOCK_PATTERNS.shaveAndHaircut;
+const KNOCK_PATTERN_SOLUTION_THRESHOLDS = KNOCK_PATTERNS_SOLUTION_THRESHOLDS.shaveAndHaircut;
 
 export default class KnockGameStore extends events.EventEmitter {
   /**
@@ -33,7 +37,7 @@ export default class KnockGameStore extends events.EventEmitter {
    */
   static sendInitialKnockPattern(dispatcher) {
     dispatcher.dispatch({
-      actionType: GameConstants.ACTION_TYPE_CHANGE_KNOCK_GAME,
+      actionType: GameConstants.ACTION_TYPE_CHANGE_KNOCK_PATTERN,
       pattern: KNOCK_PATTERN
     });
   }
@@ -48,15 +52,58 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   _handleDispatcherPayload(payload) {
-    if (payload.actionType === GameConstants.ACTION_TYPE_CHANGE_KNOCK_GAME) {
-      this.data.set("pattern", payload.pattern);
+    switch (payload.actionType) {
+      case GameConstants.ACTION_TYPE_CHANGE_KNOCK_PATTERN:
+        this._actionChangeKnockPattern(payload);
+        break;
+      case GameConstants.ACTION_TYPE_DETECT_KNOCK_PATTERN:
+        this._actionDetectKnockPattern(payload);
+        break;
+      default:
+        break;
     }
 
     this._emitChanges();
   }
 
+  _actionChangeKnockPattern(payload) {
+    this.data.set("pattern", payload.pattern);
+  }
+
+  _actionDetectKnockPattern(payload) {
+    const pattern = payload.pattern;
+    const patternSolution = KNOCK_PATTERN_SOLUTION_THRESHOLDS;
+
+    const patternAccepted = this._checkPattern(pattern, patternSolution);
+
+    if (patternAccepted) {
+      this.data.set("complete", true);
+    }
+  }
+
+  _checkPattern(pattern, patternSolution) {
+    if (pattern.length !== patternSolution.length) {
+      return false;
+    }
+
+    let patternAccepted = true;
+    let i = 0;
+    for (let [minThreshold, maxThreshold] of patternSolution) {
+      if (pattern[i] < minThreshold || pattern[i] > maxThreshold) {
+        patternAccepted = false;
+        break;
+      }
+      i++;
+    }
+
+    return patternAccepted;
+  }
+
   _emitChanges() {
     const changes = this.data.getChangedCurrentValues();
+    if (!Object.keys(changes).length) {
+      return;
+    }
     this.data.clearChanges();
 
     this.emit(GameConstants.EVENT_CHANGE, changes);
