@@ -22,7 +22,7 @@ export default class KnockGameStore extends events.EventEmitter {
   constructor(dispatcher) {
     super();
 
-    this.data = new DataChangeTracker({
+    this._data = new DataChangeTracker({
       complete: false,
       pattern: null
     });
@@ -40,6 +40,20 @@ export default class KnockGameStore extends events.EventEmitter {
       actionType: GameConstants.ACTION_TYPE_CHANGE_KNOCK_PATTERN,
       pattern: KNOCK_PATTERN
     });
+  }
+
+  /**
+   * @returns {Boolean} Whether the game has been completed or not
+   */
+  get isComplete() {
+    return this._data.get('complete');
+  }
+
+  /**
+   * @returns {?Number[]} The current knock pattern being played
+   */
+  get knockPattern() {
+    return this._data.get('pattern');
   }
 
   /**
@@ -67,7 +81,7 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   _actionChangeKnockPattern(payload) {
-    this.data.set("pattern", payload.pattern);
+    this._data.set("pattern", payload.pattern);
   }
 
   _actionDetectKnockPattern(payload) {
@@ -77,7 +91,7 @@ export default class KnockGameStore extends events.EventEmitter {
     const patternAccepted = this._checkPattern(pattern, patternSolution);
 
     if (patternAccepted) {
-      this.data.set("complete", true);
+      this._data.set("complete", true);
     }
   }
 
@@ -100,11 +114,11 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   _emitChanges() {
-    const changes = this.data.getChangedCurrentValues();
+    const changes = this._data.getChangedCurrentValues();
     if (!Object.keys(changes).length) {
       return;
     }
-    this.data.clearChanges();
+    this._data.clearChanges();
 
     this.emit(GameConstants.EVENT_CHANGE, changes);
   }
