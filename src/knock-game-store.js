@@ -50,7 +50,7 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   /**
-   * @returns {?Number[]} The current knock pattern being played
+   * @returns {Number[]} The current knock pattern being played or null if no knock pattern is set
    */
   get knockPattern() {
     return this._data.get('pattern');
