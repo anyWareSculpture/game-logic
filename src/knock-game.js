@@ -10,38 +10,25 @@ const TIME_OFFSET_BETWEEN_CYCLES = 5000; // ms
 
 export default class KnockGame {
   constructor() {
-    this._targetPattern = KNOCK_PATTERN;
-    this._targetPatternPosition = 0;
-
-    this._delay = null;
+    this._targetPattern = null;
 
     this.store = new VersionedStore({
-      knocking: false
+      complete: false
     });
   }
 
   // Store properties
-  get isKnocking() {
-    return this.store.get("knocking");
+  get isComplete() {
+    return this.store.get("complete");
   }
 
   onFrame() {
-    this.store.set("knocking", false);
+    this.store.set("complete", false);
 
-    if (!(this._delay && this._delay.isActive)) {
-      this.produceKnock();
-      this._targetPatternPosition += 1;
+    if (!this._targetPattern) {
+      this._targetPattern = KNOCK_PATTERN;
 
-      let delay;
-      if (this._targetPatternPosition < this._targetPattern.length) {
-        delay = this._targetPattern[this._targetPatternPosition];
-      }
-      else {
-        delay = TIME_OFFSET_BETWEEN_CYCLES;
-        this._targetPatternPosition = 0;
-      }
 
-      this._delay = new AsyncDelay(delay);
     }
   }
 
