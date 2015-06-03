@@ -2,12 +2,13 @@
   "name": "@anyware/game-logic",
   "version": "2.1.0",
   "description": "Game logic for anyWare",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",
