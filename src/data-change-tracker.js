@@ -36,7 +36,7 @@ export default class DataChangeTracker {
     this._assertValidProperty(name);
 
     if (this._data.hasOwnProperty(name)) {
-      if (this._changes[name] !== this._data[name]) {
+      if (value !== this._data[name]) {
         this._changes[name] = this._data[name];
       }
     }
