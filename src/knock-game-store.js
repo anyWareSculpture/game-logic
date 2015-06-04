@@ -95,6 +95,7 @@ export default class KnockGameStore extends events.EventEmitter {
     const patternAccepted = this._checkPattern(pattern, patternSolution);
 
     if (patternAccepted) {
+      this._data.set("complete", null);
       this._data.set("complete", true);
     }
   }
