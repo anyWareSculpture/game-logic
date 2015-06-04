@@ -22,12 +22,14 @@
   },
   "homepage": "https://github.com/anyWareSculpture/game-logic",
   "devDependencies": {
-    "@anyware/gulp-utils": "^1.0.6",
     "babel": "^5.4.7",
     "chai": "^2.3.0",
-    "gulp": "^3.8.11",
     "rewire": "^2.3.3",
-    "run-sequence": "^1.1.0",
     "sinon": "^1.14.1"
+  },
+  "dependencies": {
+    "@anyware/gulp-utils": "^1.0.1",
+    "run-sequence": "^1.1.0",
+    "gulp": "^3.9.0"
   }
 }
