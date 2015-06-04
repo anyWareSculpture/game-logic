@@ -73,6 +73,9 @@ export default class KnockGameStore extends events.EventEmitter {
       case GameConstants.ACTION_TYPE_DETECT_KNOCK_PATTERN:
         this._actionDetectKnockPattern(payload);
         break;
+      case GameConstants.ACTION_TYPE_MERGE_GAME_STATE:
+        this._actionMergeGameState(payload);
+        break;
       default:
         break;
     }
@@ -91,6 +94,13 @@ export default class KnockGameStore extends events.EventEmitter {
     const patternAccepted = this._checkPattern(pattern, patternSolution);
 
     if (patternAccepted) {
+      this._data.set("complete", true);
+    }
+  }
+
+  _actionMergeGameState(payload) {
+    const stateUpdate = payload.stateUpdate;
+    if (stateUpdate.complete) {
       this._data.set("complete", true);
     }
   }
