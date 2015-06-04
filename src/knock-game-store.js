@@ -86,6 +86,7 @@ export default class KnockGameStore extends events.EventEmitter {
   _actionChangeKnockPattern(payload) {
     this._data.set("pattern", null);
     this._data.set("pattern", payload.pattern);
+    this._data.set("complete", false);
   }
 
   _actionDetectKnockPattern(payload) {
@@ -95,7 +96,6 @@ export default class KnockGameStore extends events.EventEmitter {
     const patternAccepted = this._checkPattern(pattern, patternSolution);
 
     if (patternAccepted) {
-      this._data.set("complete", null);
       this._data.set("complete", true);
     }
   }
