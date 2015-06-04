@@ -84,6 +84,7 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   _actionChangeKnockPattern(payload) {
+    this._data.set("pattern", null);
     this._data.set("pattern", payload.pattern);
   }
 
