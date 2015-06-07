@@ -3,4 +3,5 @@ node_js:
   - "0.12"
 before_script:
   - npm install -g gulp
-script: gulp; gulp submit-coverage
+script: gulp
+after_script: gulp submit-coverage
