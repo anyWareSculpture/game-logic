@@ -29,6 +29,7 @@ export default class DataChangeTracker {
 
   /**
    * Stores the given value and tracks its old value as changed
+   * Even if the same value is stored twice, a change will still be registered
    * @param {string} name - The name of the property to set
    * @param {*} value - The value to store
    */
@@ -36,9 +37,7 @@ export default class DataChangeTracker {
     this._assertValidProperty(name);
 
     if (this._data.hasOwnProperty(name)) {
-      if (value !== this._data[name]) {
-        this._changes[name] = this._data[name];
-      }
+      this._changes[name] = this._data[name];
     }
 
     this._data[name] = value;
