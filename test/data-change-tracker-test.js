@@ -57,22 +57,74 @@ describe('DataChangeTracker', () => {
   });
 
   it('should not have any changes registered initially', () => {
+    const data = new DataChangeTracker();
 
+    expect(data.getChangedPropertyNames()).to.be.empty;
+    expect(data.getChangedOldValues()).to.be.empty;
+    expect(data.getChangedCurrentValues()).to.be.empty;
   });
 
   it('should save old and current values for each change', () => {
-    // test get() == getChangedCurrentValues()
+    const data = new DataChangeTracker();
+    
+    const propertyName = "test1345";
+    const oldValue = "oldvalue";
+    const newValue = "newvalue";
+
+    data.set(propertyName, oldValue);
+    data.set(propertyName, newValue);
+    expect(data.get(propertyName)).to.equal(newValue);
+    expect(data.getChangedPropertyNames()).to.have.length(1);
+    expect(data.getChangedPropertyNames()).to.have.members([propertyName]);
+    expect(data.getChangedOldValues()[propertyName]).to.equal(oldValue);
+    expect(data.getChangedCurrentValues()[propertyName]).to.equal(newValue);
+    expect(data.getChangedCurrentValues()[propertyName]).to.equal(data.get(propertyName));
   });
 
   it('should allow clearing of any currently registered changes', () => {
+    const data = new DataChangeTracker();
 
+    data.set("a", 0);
+    data.set("b", 0);
+    data.set("c", 0);
+
+    expect(data.getChangedCurrentValues()).to.be.empty;
+
+    data.set("a", 1);
+    data.set("b", 2);
+    data.set("c", 3);
+
+    expect(data.getChangedCurrentValues()).to.eql({a: 1, b: 2, c: 3});
+
+    data.clearChanges();
+
+    expect(data.getChangedCurrentValues()).to.be.empty;
   });
 
   it('should store changed property names correctly', () => {
+    const data = new DataChangeTracker();
 
+    const propertyNames = ["abc", "test", "qqq", "helloworld"];
+    for (let name of propertyNames) {
+      data.set(name, 1);
+      data.set(name, 3);
+    }
+
+    expect(data.getChangedPropertyNames()).to.eql(propertyNames);
   });
 
   it('should register changes even if the same value is set twice', () => {
+    const data = new DataChangeTracker();
+    
+    const name = "abc";
 
+    data.set(name, 1);
+    expect(data.getChangedCurrentValues()).to.be.empty;
+    data.set(name, 2);
+    expect(data.getChangedCurrentValues()[name]).to.equal(2);
+    data.set(name, 2);
+    expect(data.getChangedCurrentValues()[name]).to.equal(2);
+    data.set(name, 2);
+    expect(data.getChangedCurrentValues()[name]).to.equal(2);
   });
 });
