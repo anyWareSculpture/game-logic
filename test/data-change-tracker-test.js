@@ -1,7 +1,6 @@
 /*eslint no-unused-expressions: 0, no-new: 0 */
 // The above is done in order to support chai assertion syntax without lint errors
 
-const sinon = require('sinon');
 const expect = require('chai').expect;
 const rewire = require('rewire');
 
@@ -34,11 +33,11 @@ describe('DataChangeTracker', () => {
 
   it('should get and set names correctly', () => {
     const data = new DataChangeTracker();
-    
+
     const value = "somevalue1";
     data.set("test", value);
     expect(data.get("test")).to.equal(value);
-    
+
     // It's important that the value can be changed once it is set once
     const someOtherValue = "someothervalue2";
     data.set("test", someOtherValue);
@@ -66,7 +65,7 @@ describe('DataChangeTracker', () => {
 
   it('should save old and current values for each change', () => {
     const data = new DataChangeTracker();
-    
+
     const propertyName = "test1345";
     const oldValue = "oldvalue";
     const newValue = "newvalue";
@@ -115,7 +114,7 @@ describe('DataChangeTracker', () => {
 
   it('should register changes even if the same value is set twice', () => {
     const data = new DataChangeTracker();
-    
+
     const name = "abc";
 
     data.set(name, 1);
