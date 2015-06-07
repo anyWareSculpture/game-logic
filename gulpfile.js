@@ -10,7 +10,7 @@ MINIMUM_CODE_COVERAGE = 90;
 require('@anyware/gulp-utils/tasks/test-task')(
   gulp,
   'test', // taskName
-  'src/**/*.js', // filesToCover
+  ['src/**/*.js', '!src/index.js'], // filesToCover
   'test/**/*-test.js', // testFiles
   process.env.TRAVIS ? 'spec' : 'nyan', // reporter
   MINIMUM_CODE_COVERAGE // minimumCodeCoverage
