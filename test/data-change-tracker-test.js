@@ -4,7 +4,7 @@
 const expect = require('chai').expect;
 const rewire = require('rewire');
 
-const DataChangeTracker = rewire('../src/data-change-tracker');
+const DataChangeTracker = rewire('../src/utils/data-change-tracker');
 
 describe('DataChangeTracker', () => {
   it('should not restrict property names when no arguments are passed in', () => {

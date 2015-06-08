@@ -1,2 +1,2 @@
 export const GameConstants = require('./game-constants');
-export const KnockGameStore = require('./knock-game-store');
+export const KnockGameStore = require('./stores/knock-game-store');
