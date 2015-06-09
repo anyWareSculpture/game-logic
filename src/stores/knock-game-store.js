@@ -9,8 +9,6 @@ const KNOCK_PATTERNS = {
 const KNOCK_PATTERNS_SOLUTION_THRESHOLDS = {
   shaveAndHaircut: [[800, 1600], [400, 600]]
 };
-const KNOCK_PATTERN = KNOCK_PATTERNS.shaveAndHaircut;
-const KNOCK_PATTERN_SOLUTION_THRESHOLDS = KNOCK_PATTERNS_SOLUTION_THRESHOLDS.shaveAndHaircut;
 
 export default class KnockGameStore extends events.EventEmitter {
   /**
@@ -24,7 +22,7 @@ export default class KnockGameStore extends events.EventEmitter {
 
     this._data = new DataChangeTracker({
       complete: false,
-      pattern: null
+      patternId: null
     });
     this.dispatchToken = null;
 
@@ -39,10 +37,24 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   /**
-   * @returns {Number[]} The current knock pattern being played or null if no knock pattern is set
+   * @returns {String} The pattern ID from KNOCK_PATTERNS currently being played or null if no pattern ID has been set
+   */
+  get knockPatternId() {
+    return this._data.get('patternId');
+  }
+
+  /**
+   * @returns {Number[]} The knock pattern being played or null if no pattern has been set yet
    */
   get knockPattern() {
-    return this._data.get('pattern');
+    return KNOCK_PATTERNS[this.knockPatternId] || null;
+  }
+
+  /**
+   * @returns {Number[][]} The knock pattern solution thresholds ([min, max]) for the knock pattern that was played or null
+   */
+  get knockPatternSolutionThresholds() {
+    return KNOCK_PATTERNS_SOLUTION_THRESHOLDS[this.knockPatternId] || null;
   }
 
   /**
@@ -73,16 +85,15 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   _actionChangeKnockPattern(payload) {
-    this._data.set("pattern", null);
-    this._data.set("pattern", payload.pattern);
+    this._data.set("patternId", payload.pattern);
     this._data.set("complete", false);
   }
 
   _actionDetectKnockPattern(payload) {
-    const pattern = payload.pattern;
-    const patternSolution = KNOCK_PATTERN_SOLUTION_THRESHOLDS;
+    const receivedPattern = payload.pattern;
+    const patternSolution = this.knockPatternSolutionThresholds;
 
-    const patternAccepted = this._checkPattern(pattern, patternSolution);
+    const patternAccepted = this._checkPattern(receivedPattern, patternSolution);
 
     if (patternAccepted) {
       this._data.set("complete", true);
