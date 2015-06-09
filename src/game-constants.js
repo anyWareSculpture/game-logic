@@ -1,8 +1,11 @@
 export default {
-  // Flux Action Types
-  ACTION_TYPE_CHANGE_KNOCK_PATTERN: 'knock-pattern-change',
-  ACTION_TYPE_DETECT_KNOCK_PATTERN: 'knock-pattern-detect',
-  ACTION_TYPE_MERGE_GAME_STATE: 'merge-game-state',
+  knockGame: {
+    actions: {
+      SET_KNOCK_PATTERN: 'knock-pattern-set',
+      DETECT_KNOCK_PATTERN: 'knock-pattern-detect',
+      MERGE_STATE: 'game-state-merge',
+    }
+  },
 
   // Events
   EVENT_CHANGE: 'change'

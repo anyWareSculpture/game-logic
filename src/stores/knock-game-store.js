@@ -32,17 +32,6 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   /**
-   * Sends the initial knock pattern to the provided dispatcher
-   * @param {Dispatcher} dispatcher - A dispatcher that implements flux's dispatcher API
-   */
-  static sendInitialKnockPattern(dispatcher) {
-    dispatcher.dispatch({
-      actionType: GameConstants.ACTION_TYPE_CHANGE_KNOCK_PATTERN,
-      pattern: KNOCK_PATTERN
-    });
-  }
-
-  /**
    * @returns {Boolean} Whether the game has been completed or not
    */
   get isComplete() {
