@@ -51,7 +51,7 @@ export default class KnockGameStore extends events.EventEmitter {
   }
 
   /**
-   * @returns {Number[][]} The knock pattern solution thresholds ([min, max]) for the knock pattern that was played or null
+   * @returns {Array<Number[]>} The knock pattern solution thresholds ([min, max]) for the knock pattern that was played or null
    */
   get knockPatternSolutionThresholds() {
     return KNOCK_PATTERNS_SOLUTION_THRESHOLDS[this.knockPatternId] || null;

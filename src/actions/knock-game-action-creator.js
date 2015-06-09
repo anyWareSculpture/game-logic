@@ -7,4 +7,4 @@ export default class KnockGameActionCreator extends BaseActionCreator {
       pattern: pattern
     });
   }
-};
+}

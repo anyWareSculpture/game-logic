@@ -2,6 +2,7 @@ export default class BaseActionCreator {
   /**
    * Creates an action creator that sends all of its messages
    * to the provided dispatcher
+   * @param {Dispatcher} dispatcher - A dispatcher that implements flux's dispatcher API
    */
   constructor(dispatcher) {
     this._dispatcher = dispatcher;
