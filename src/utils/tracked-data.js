@@ -1,6 +1,6 @@
-export default class DataChangeTracker {
+export default class TrackedData {
   /**
-   * Data store that keeps track of the last properties that were changed
+   * Keeps track of the last change made to any data that is stored
    * @constructor
    * @param {Object} [validProperties=null] - An object containing valid property names as keys and that property's default value as values. If not provided, no validation will occur on property names
    */
@@ -44,11 +44,16 @@ export default class DataChangeTracker {
   }
 
   /**
-   * Retrieves a list of the names of the properties that have changed
+   * Iterates through the names of the properties that have changed
    * @returns {String[]} - The list of names
    */
-  getChangedPropertyNames() {
-    return Object.keys(this._changes);
+  *getChangedPropertyNames() {
+    yield* Object.keys(this._changes);
+    for (let propName of this._changedTrackedDataProperties()) {
+      yield propName;
+    }
+
+    return changedNames;
   }
 
   /**
@@ -57,7 +62,15 @@ export default class DataChangeTracker {
    * @returns {Object} - Object where keys are the names of each changed property and values are the previous value of that property
    */
   getChangedOldValues() {
-    return Object.assign({}, this._changes);
+    const changed = Object.assign({}, this._changes);
+
+    for (let propName of this._changedTrackedDataProperties()) {
+      if (!changed.hasOwnProperty(propName)) {
+        changed[propName] = this.get(propName).getChangedOldValues();
+      }
+    }
+
+    return changed;
   }
 
   /**
@@ -67,9 +80,10 @@ export default class DataChangeTracker {
    */
   getChangedCurrentValues() {
     const changed = {};
-
-    for (let propName of Object.keys(this._changes)) {
-      changed[propName] = this.get(propName);
+    
+    const changedPropertyNames = Array.from(this._changedTrackedDataProperties()).concat(Object.keys(this._changes));
+    for (let propName of changedPropertyNames) {
+      changed[propName] = this.get(propName).getChangedCurrentValues();
     }
 
     return changed;
@@ -80,6 +94,17 @@ export default class DataChangeTracker {
    */
   clearChanges() {
     this._changes = {};
+  }
+
+  *_changedTrackedDataProperties(changedProps) {
+    for (let propName of Object.keys(this._data)) {
+      const value = this.get(propName);
+      if (valid instanceof TrackedData) {
+        if (value.getChangedPropertyNames().length > 0) {
+          yield propName;
+        }
+      }
+    }
   }
 
   _assertValidProperty(name) {
