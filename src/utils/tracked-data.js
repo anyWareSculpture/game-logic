@@ -45,15 +45,12 @@ export default class TrackedData {
 
   /**
    * Iterates through the names of the properties that have changed
-   * @returns {String[]} - The list of names
    */
   *getChangedPropertyNames() {
     yield* Object.keys(this._changes);
     for (let propName of this._changedTrackedDataProperties()) {
       yield propName;
     }
-
-    return changedNames;
   }
 
   /**
@@ -80,7 +77,7 @@ export default class TrackedData {
    */
   getChangedCurrentValues() {
     const changed = {};
-    
+
     const changedPropertyNames = Array.from(this._changedTrackedDataProperties()).concat(Object.keys(this._changes));
     for (let propName of changedPropertyNames) {
       changed[propName] = this.get(propName).getChangedCurrentValues();
@@ -96,10 +93,10 @@ export default class TrackedData {
     this._changes = {};
   }
 
-  *_changedTrackedDataProperties(changedProps) {
+  *_changedTrackedDataProperties() {
     for (let propName of Object.keys(this._data)) {
       const value = this.get(propName);
-      if (valid instanceof TrackedData) {
+      if (value instanceof TrackedData) {
         if (value.getChangedPropertyNames().length > 0) {
           yield propName;
         }
