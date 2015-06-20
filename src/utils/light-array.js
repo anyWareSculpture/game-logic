@@ -5,74 +5,83 @@ const DEFAULT_INTENSITY = 0.0;
 const COLOR_DEFAULT = "default";
 
 export default class LightArray extends TrackedData {
-  constructor(rowLengths, defaultIntensity=DEFAULT_INTENSITY, defaultColor=COLOR_DEFAULT) {
+  constructor(stripLengths, defaultIntensity=DEFAULT_INTENSITY, defaultColor=COLOR_DEFAULT) {
     const properties = {};
-    for (let row = 0; row < rowLengths.length; row++) {
-      const rowValues = [];
-      for (let i = 0; i < rowLengths[row]; i++) {
-        rowValues.push({
+    for (let stripId of Object.keys(stripLengths)) {
+      const strip = {};
+      for (let panelId = 0; panelId < stripLengths[stripId]; panelId++) {
+        strip[panelId] = new TrackedData({
           intensity: defaultIntensity,
-          color: defaultColor
+          color: defaultColor,
+          active: false
         });
       }
-      properties[row] = {
+      properties[stripId] = new TrackedData({
         maxIntensity: 1.0,
-        values: rowValues
-      };
+        panels: new TrackedData(strip)
+      });
     }
     super(properties);
 
-    this.rowCount = rowLengths.length;
+    this.stripIds = Object.keys(stripLengths);
   }
 
-  setMaxIntensity(intensity, row=null) {
-    let rows_to_modify;
-    if (row === null) {
-      rows_to_modify = [];
-      for (let i = 0; i < this.rowCount; i++) {
-        rows_to_modify.push(i);
-      }
+  setMaxIntensity(intensity, stripId=null) {
+    const stripsToModify = stripId === null ? this.stripIds : [stripId];
+
+    for (let targetStripId of stripsToModify) {
+      const strip = this.get(targetStripId);
+      strip.set("maxIntensity", intensity);
     }
-    else {
-      rows_to_modify = [row];
-    }
-
-    
   }
 
-  getMaxIntensity(row) {
-    
+  getMaxIntensity(stripId) {
+    return this.get(stripId).get("maxIntensity");
   }
 
-  setColor(row, col, color) {
-    
+  getPanel(stripId, panelId) {
+    return this.get(stripId).get("panels").get(panelId);
   }
 
-  getColor(row, col) {
-    
+  setColor(stripId, panelId, color) {
+    const panel = this.getPanel(stripId, panelId);
+
+    panel.set("color", color);
   }
 
-  isActive(row, col) {
+  getColor(stripId, panelId) {
+    const panel = this.getPanel(stripId, panelId);
 
+    return panel.get("color");
   }
 
-  getIntensity(row, col) {
+  getIntensity(stripId, panelId) {
+    const panel = this.getPanel(stripId, panelId);
 
+    return panel.get("intensity");
   }
 
-  activate(row, col, intensity=1.0) {
+  setIntensity(stripId, panelId, intensity) {
+    const panel = this.getPanel(stripId, panelId);
 
+    panel.set("intensity", intensity);
   }
 
-  deactivate(row, col) {
+  isActive(stripId, panelId) {
+    const panel = this.getPanel(stripId, panelId);
 
+    return panel.get("active");
   }
 
-  activateAll(row=null, intensity=1.0) {
+  activate(stripId, panelId) {
+    const panel = this.getPanel(stripId, panelId);
 
+    panel.set("active", true);
   }
 
-  deactivateAll(row=null) {
+  deactivate(stripId, panelId) {
+    const panel = this.getPanel(stripId, panelId);
 
+    panel.set("active", false);
   }
 }
