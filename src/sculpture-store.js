@@ -21,11 +21,25 @@ export default class SculptureStore extends events.EventEmitter {
       'mole': new TrackedData(MoleGameLogic.trackedProperties)
     });
 
-    this._registerDispatcher(dispatcher);
+    this.currentGame = null;
+    this.dispatchToken = this._registerDispatcher(dispatcher);
+
+    // temporarily here to test the mole game
+    this.startMoleGame();
+  }
+
+  startMoleGame() {
+    this._startGame(new MoleGameLogic(this));
+  }
+
+  _startGame(gameLogic) {
+    this.currentGame = gameLogic;
+    this.currentGame.start();
+    //TODO: Publish a change event
   }
 
   _registerDispatcher(dispatcher) {
-    dispatcher.register(this._handleActionPayload.bind(this));
+    return dispatcher.register(this._handleActionPayload.bind(this));
   }
 
   _handleActionPayload(payload) {

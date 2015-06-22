@@ -1,6 +1,6 @@
 const TrackedData = require('./tracked-data');
 
-const DEFAULT_INTENSITY = 0.0;
+const DEFAULT_INTENSITY = 0;
 
 const COLOR_DEFAULT = "default";
 
@@ -17,7 +17,7 @@ export default class LightArray extends TrackedData {
         });
       }
       properties[stripId] = new TrackedData({
-        maxIntensity: 1.0,
+        maxIntensity: 100,
         panels: new TrackedData(strip)
       });
     }
@@ -44,9 +44,7 @@ export default class LightArray extends TrackedData {
   }
 
   setColor(stripId, panelId, color) {
-    const panel = this.getPanel(stripId, panelId);
-
-    panel.set("color", color);
+    this._applyToOnePanelOrAll((panel) => panel.set("color", color), stripId, panelId);
   }
 
   getColor(stripId, panelId) {
@@ -62,9 +60,7 @@ export default class LightArray extends TrackedData {
   }
 
   setIntensity(stripId, panelId, intensity) {
-    const panel = this.getPanel(stripId, panelId);
-
-    panel.set("intensity", intensity);
+    this._applyToOnePanelOrAll((panel) => panel.set("intensity", intensity), stripId, panelId);
   }
 
   isActive(stripId, panelId) {
@@ -83,5 +79,24 @@ export default class LightArray extends TrackedData {
     const panel = this.getPanel(stripId, panelId);
 
     panel.set("active", false);
+  }
+
+  _applyToOnePanelOrAll(panelFunc, stripId, panelId=null) {
+    const panels = this._getOnePanelOrAll(stripId, panelId);
+
+    for (let panel of panels) {
+      panelFunc(panel);
+    }
+  }
+
+  _getOnePanelOrAll(stripId, panelId) {
+    if (panelId === null) {
+      // this code is necessary because there is no Object.values() function
+      const stripPanels = this.get(stripId).get("panels");
+      return [for (stripPanelId of Object.keys(stripPanels)) stripPanels[stripPanelId]];
+    }
+    else {
+      return [this.getPanel(stripId, panelId)];
+    }
   }
 }
