@@ -5,9 +5,6 @@ const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
 const STATE_READY = "ready";
-const STATE_ERROR = "error";
-const STATE_SUCCESS = "success";
-const STATE_SUCCESS = "locked";
 
 export default class SculptureStore extends events.EventEmitter {
   constructor(dispatcher) {
