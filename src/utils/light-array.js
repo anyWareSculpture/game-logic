@@ -9,17 +9,21 @@ export default class LightArray extends TrackedData {
     const properties = {};
     for (let stripId of Object.keys(stripLengths)) {
       const strip = {};
+      const panelIds = [];
       for (let panelId = 0; panelId < stripLengths[stripId]; panelId++) {
         strip[panelId] = new TrackedData({
           intensity: defaultIntensity,
           color: defaultColor,
           active: false
         });
+
+        panelIds.push(panelId);
       }
       properties[stripId] = new TrackedData({
         maxIntensity: 100,
         panels: new TrackedData(strip)
       });
+      properties[stripId].panelIds = panelIds;
     }
     super(properties);
 
