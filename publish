@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+PACKAGE="@anyware/game-logic"
+
+echo Publishing ${1:-patch}...
+echo Incrementing version from
+npm view ${PACKAGE} version
+
+echo Version now at
+npm version ${1:-patch}
+
+echo Pushing changes to git...
+git push origin --all
+
+echo Publishing to npm
+npm publish --access=public
