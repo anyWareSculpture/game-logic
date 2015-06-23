@@ -52,8 +52,7 @@ export default class MoleGameLogic {
     const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
 
     if (stripId === targetStripId && panelId === targetPanelId && pressed) {
-      targetPanelIndex += 1;
-      this.data.set("targetPanelIndex", targetPanelIndex);
+      this.data.set("targetPanelIndex", targetPanelIndex + 1);
       this._enableCurrentTargetPanel();
     }
   }
