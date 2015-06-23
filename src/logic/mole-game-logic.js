@@ -2,13 +2,13 @@ const PanelsActionCreator = require('../actions/panels-action-creator');
 
 const TARGET_PANELS = [
   // [stripId, panelId],
-  [0, 0],
-  [1, 1],
-  [2, 2],
-  [1, 2],
-  [0, 3],
-  [2, 5],
-  [0, 0]
+  ['0', '0'],
+  ['1', '1'],
+  ['2', '2'],
+  ['1', '2'],
+  ['0', '3'],
+  ['2', '5'],
+  ['0', '0']
 ];
 
 const TARGET_PANEL_INTENSITY = 100;
