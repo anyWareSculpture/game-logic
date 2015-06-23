@@ -3,7 +3,7 @@ const BaseActionCreator = require('./base-action-creator');
 export default class PanelsActionCreator extends BaseActionCreator {
   // Action types
   static PANEL_PRESSED = "panel-pressed";
-  
+
   /**
    * Sends an action representing when a panel is pressed to the
    * dispatcher.
