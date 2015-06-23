@@ -1,3 +1,5 @@
+const PanelsActionCreator = require('../actions/panels-action-creator');
+
 const TARGET_PANELS = [
   // [stripId, panelId],
   [0, 0],
@@ -30,10 +32,40 @@ export default class MoleGameLogic {
     this._enableCurrentTargetPanel();
   }
 
+  handleActionPayload(payload) {
+    switch(payload.actionType) {
+      case PanelsActionCreator.PANEL_PRESSED:
+        this._handlePanelPressed(payload);
+        break;
+      default:
+        // Do nothing for unrecognized actions
+        break;
+    }
+  }
+
+  _handlePanelPressed(payload) {
+    {stripId, panelId, pressed} = payload;
+    
+    this.store.data.get('lights').activate(stripId, panelId, pressed);
+
+    const targetPanelIndex = this.data.get("targetPanelIndex");
+    const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
+
+    if (stripId === targetStripId && panelId === targetPanelId && pressed) {
+      targetPanelIndex += 1;
+      this.data.set("targetPanelIndex", targetPanelIndex);
+      this._enableCurrentTargetPanel();
+    }
+  }
+
   _enableCurrentTargetPanel() {
     const targetPanelIndex = this.data.get("targetPanelIndex");
     if (targetPanelIndex > 0) {
       this._disablePanelIndex(targetPanelIndex - 1);
+    }
+
+    if (targetPanelIndex >= TARGET_PANELS.length) {
+      //TODO: Reached end
     }
 
     const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);

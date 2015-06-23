@@ -44,5 +44,10 @@ export default class SculptureStore extends events.EventEmitter {
 
   _handleActionPayload(payload) {
     console.log(payload);
+
+    if (this.currentGame !== null) {
+      this.currentGame.handleActionPayload(payload);
+    }
+    //TODO: Publish a change event
   }
 }
