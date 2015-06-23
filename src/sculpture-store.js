@@ -1,6 +1,8 @@
 const events = require('events');
 
+const GameConstants = require('./game-constants');
 const MoleGameLogic = require('./logic/mole-game-logic');
+const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
@@ -35,7 +37,8 @@ export default class SculptureStore extends events.EventEmitter {
   _startGame(gameLogic) {
     this.currentGame = gameLogic;
     this.currentGame.start();
-    //TODO: Publish a change event
+
+    this._publishChanges();
   }
 
   _registerDispatcher(dispatcher) {
@@ -43,11 +46,26 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _handleActionPayload(payload) {
-    console.log(payload);
+    if (payload.actionType === SculptureActionCreator.MERGE_STATE) {
+      this._mergeState(payload);
+    }
 
     if (this.currentGame !== null) {
       this.currentGame.handleActionPayload(payload);
     }
-    //TODO: Publish a change event
+
+    this._publishChanges();
+  }
+
+  _publishChanges() {
+    const changes = this.data.getChangedCurrentValues();
+    
+    if (Object.keys(changes).length) {
+      this.emit(GameConstants.EVENT_CHANGE, changes);
+    }
+  }
+
+  _mergeState(state) {
+    //TODO: Merge state only if properties have actually changed
   }
 }
