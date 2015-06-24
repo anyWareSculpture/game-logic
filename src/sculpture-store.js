@@ -66,7 +66,14 @@ export default class SculptureStore extends events.EventEmitter {
     return this.data.get('status') === SculptureStore.STATUS_LOCKED;
   }
 
-  publishChanges() {
+  _startGame(gameLogic) {
+    this.currentGame = gameLogic;
+    this.currentGame.start();
+
+    this._publishChanges();
+  }
+
+  _publishChanges() {
     const changes = this.data.getChangedCurrentValues();
 
     if (Object.keys(changes).length) {
@@ -74,13 +81,6 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     this.data.clearChanges();
-  }
-
-  _startGame(gameLogic) {
-    this.currentGame = gameLogic;
-    this.currentGame.start();
-
-    this.publishChanges();
   }
 
   _registerDispatcher(dispatcher) {
@@ -98,7 +98,7 @@ export default class SculptureStore extends events.EventEmitter {
       this.currentGame.handleActionPayload(payload);
     }
 
-    this.publishChanges();
+    this._publishChanges();
   }
 
   _actionCanRunWhenLocked(actionType) {
