@@ -7,8 +7,7 @@ const TARGET_PANELS = [
   ['2', '2'],
   ['1', '2'],
   ['0', '3'],
-  ['2', '5'],
-  ['0', '0']
+  ['2', '5']
 ];
 
 const TARGET_PANEL_INTENSITY = 100;
