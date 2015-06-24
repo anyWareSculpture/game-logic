@@ -96,6 +96,11 @@ export default class TrackedData {
    */
   clearChanges() {
     this._changes = {};
+
+    for (let propName of this._changedTrackedDataProperties()) {
+      this.get(propName).clearChanges();
+    }
+
   }
 
   *_changedTrackedDataProperties() {
