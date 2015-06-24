@@ -78,9 +78,12 @@ export default class TrackedData {
   getChangedCurrentValues() {
     const changed = {};
 
-    const changedPropertyNames = Array.from(this._changedTrackedDataProperties()).concat(Object.keys(this._changes));
-    for (let propName of changedPropertyNames) {
+    for (let propName of this._changedTrackedDataProperties()) {
       changed[propName] = this.get(propName).getChangedCurrentValues();
+    }
+
+    for (let propName of Object.keys(this._changes)) {
+      changed[propName] = this.get(propName);
     }
 
     return changed;
@@ -97,7 +100,7 @@ export default class TrackedData {
     for (let propName of Object.keys(this._data)) {
       const value = this.get(propName);
       if (value instanceof TrackedData) {
-        if (value.getChangedPropertyNames().length > 0) {
+        if (!value.getChangedPropertyNames().next().done) {
           yield propName;
         }
       }
