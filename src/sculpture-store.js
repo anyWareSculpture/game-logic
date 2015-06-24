@@ -6,7 +6,8 @@ const PanelsActionCreator = require('./actions/panels-action-creator');
 const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
-const STATE_READY = "ready";
+const STATUS_READY = "ready";
+const STATUS_LOCKED = "locked";
 
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
@@ -15,7 +16,7 @@ export default class SculptureStore extends events.EventEmitter {
     super();
 
     this.data = new TrackedData({
-      'state': STATE_READY,
+      'status': STATUS_READY,
       'lights': new LightArray({
         // stripId : number of panels
         '0': 10,
@@ -27,14 +28,43 @@ export default class SculptureStore extends events.EventEmitter {
 
     this.currentGame = null;
     this.dispatchToken = this._registerDispatcher(dispatcher);
+    this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
   }
 
+  /**
+   * Starts playing the mole game and does any necessary initialization work
+   */
   startMoleGame() {
     this._startGame(new MoleGameLogic(this));
   }
 
+  /**
+   * @returns {Boolean} Returns whether the mole game is currently being played
+   */
   get isPlayingMoleGame() {
     return this.currentGame instanceof MoleGameLogic;
+  }
+
+  /**
+   * Restores the sculpture's status back to ready
+   */
+  restoreStatus() {
+    this.sculptureActionCreator.sendMergeState({
+      status: STATUS_READY
+    });
+  }
+
+  /**
+   * Locks the sculpture from any input
+   */
+  lock() {
+    this.sculptureActionCreator.sendMergeState({
+      status: STATUS_LOCKED
+    });
+  }
+
+  get isLocked() {
+    return this.data.get('status') === STATUS_LOCKED;
   }
 
   _startGame(gameLogic) {
@@ -49,16 +79,18 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _handleActionPayload(payload) {
-    switch (payload.actionType) {
-      case SculptureActionCreator.MERGE_STATE:
-        this._actionMergeState(payload);
-        break;
-      case PanelsActionCreator.PANEL_PRESSED:
-        this._actionPanelPressed(payload);
-        break;
-      default:
-        // Do nothing for unrecognized actions
-        break;
+    if (this.isLocked && payload.actionType !== SculptureActionCreator.MERGE_STATE) {
+      return;
+    }
+
+    const actionHandlers = {
+      [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
+      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this)
+    };
+
+    const actionHandler = actionHandlers[payload.actionType];
+    if (actionHandler) {
+      actionHandler(payload);
     }
 
     if (this.currentGame !== null) {
@@ -70,18 +102,43 @@ export default class SculptureStore extends events.EventEmitter {
 
   _publishChanges() {
     const changes = this.data.getChangedCurrentValues();
-    
+
     if (Object.keys(changes).length) {
       this.emit(SculptureStore.EVENT_CHANGE, changes);
     }
+
+    this.data.clearChanges();
   }
 
-  _actionMergeState(state) {
-    //TODO: Merge state only if properties have actually changed
+  _actionMergeState(payload) {
+    const mergeFunctions = {
+      status: this._mergeStatus.bind(this),
+      lights: this._mergeLights.bind(this),
+      mole: this._mergeMole.bind(this)
+    };
+
+    for (let propName of Object.keys(payload)) {
+      const mergeFunction = mergeFunctions[propName];
+      if (mergeFunction) {
+        mergeFunction(payload[propName]);
+      }
+    }
   }
 
   _actionPanelPressed(payload) {
     const {stripId, panelId, pressed} = payload;
     this.data.get('lights').activate(stripId, panelId, pressed);
+  }
+
+  _mergeStatus(newStatus) {
+    this.data.set('status', newStatus);
+  }
+
+  _mergeLights(lightChanges) {
+    //TODO
+  }
+
+  _mergeMole(moleChanges) {
+    //TODO
   }
 }
