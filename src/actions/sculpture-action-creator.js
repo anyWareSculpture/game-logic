@@ -1,5 +1,5 @@
 const BaseActionCreator = require('./base-action-creator');
-const {SculptureStore} = require('@anyware/game-logic');
+const {SculptureStore} = require('../sculpture-store');
 
 export default class SculptureActionCreator extends BaseActionCreator {
   // Action types
