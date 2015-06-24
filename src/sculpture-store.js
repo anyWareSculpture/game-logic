@@ -27,13 +27,14 @@ export default class SculptureStore extends events.EventEmitter {
 
     this.currentGame = null;
     this.dispatchToken = this._registerDispatcher(dispatcher);
-
-    // temporarily here to test the mole game
-    this.startMoleGame();
   }
 
   startMoleGame() {
     this._startGame(new MoleGameLogic(this));
+  }
+
+  get isPlayingMoleGame() {
+    return this.currentGame instanceof MoleGameLogic;
   }
 
   _startGame(gameLogic) {
