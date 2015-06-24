@@ -1,7 +1,7 @@
 const BaseActionCreator = require('./base-action-creator');
 const {SculptureStore} = require('@anyware/game-logic');
 
-export default class SculptureActionCreator extends BaseActionCreator {
+export default class MoleGameActionCreator extends BaseActionCreator {
   // Action types
   static MERGE_STATE = "merge-state";
 
@@ -13,12 +13,9 @@ export default class SculptureActionCreator extends BaseActionCreator {
     this._dispatch(SculptureActionCreator.MERGE_STATE, state);
   }
 
-  sendEndMoleGameAnimation() {
+  sendUnlockStatus() {
     this.sendMergeState({
-      status: SculptureStore.STATUS_READY,
-      mole: {
-        animation: false
-      }
+      status: SculptureStore.STATUS_READY
     });
   }
 }

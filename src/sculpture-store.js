@@ -6,17 +6,17 @@ const PanelsActionCreator = require('./actions/panels-action-creator');
 const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
-const STATUS_READY = "ready";
-const STATUS_LOCKED = "locked";
-
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
+
+  static STATUS_READY = "ready";
+  static STATUS_LOCKED = "locked";
 
   constructor(dispatcher) {
     super();
 
     this.data = new TrackedData({
-      'status': STATUS_READY,
+      'status': SculptureStore.STATUS_READY,
       'lights': new LightArray({
         // stripId : number of panels
         '0': 10,
@@ -50,7 +50,7 @@ export default class SculptureStore extends events.EventEmitter {
    * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */
   restoreStatus() {
-    this.data.set('status', STATUS_READY);
+    this.data.set('status', SculptureStore.STATUS_READY);
   }
 
   /**
@@ -58,11 +58,11 @@ export default class SculptureStore extends events.EventEmitter {
    * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */
   lock() {
-    this.data.set('status', STATUS_LOCKED);
+    this.data.set('status', SculptureStore.STATUS_LOCKED);
   }
 
   get isLocked() {
-    return this.data.get('status') === STATUS_LOCKED;
+    return this.data.get('status') === SculptureStore.STATUS_LOCKED;
   }
 
   publishChanges() {
@@ -137,6 +137,8 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _mergeMole(moleChanges) {
-    //TODO
+    for (let propName of Object.keys(moleChanges)) {
+      this.data.get('mole').set(propName, moleChanges[propName]);
+    }
   }
 }
