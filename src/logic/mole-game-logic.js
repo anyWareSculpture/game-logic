@@ -62,7 +62,14 @@ export default class MoleGameLogic {
     }
 
     if (targetPanelIndex >= TARGET_PANELS.length) {
-      //TODO: Reached end
+      this.data.set("targetPanelIndex", 0);
+      this._enableCurrentTargetPanel();
+
+      //TODO: end animation
+      this.store.lock();
+      setTimeout(() => {
+        this.store.restoreStatus();
+      }, 2000);
       return;
     }
 
