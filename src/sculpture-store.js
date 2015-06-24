@@ -1,6 +1,5 @@
 const events = require('events');
 
-const GameConstants = require('./game-constants');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const LightArray = require('./utils/light-array');
@@ -9,6 +8,8 @@ const TrackedData = require('./utils/tracked-data');
 const STATE_READY = "ready";
 
 export default class SculptureStore extends events.EventEmitter {
+  static EVENT_CHANGE = "change";
+
   constructor(dispatcher) {
     super();
 
@@ -61,7 +62,7 @@ export default class SculptureStore extends events.EventEmitter {
     const changes = this.data.getChangedCurrentValues();
     
     if (Object.keys(changes).length) {
-      this.emit(GameConstants.EVENT_CHANGE, changes);
+      this.emit(SculptureStore.EVENT_CHANGE, changes);
     }
   }
 

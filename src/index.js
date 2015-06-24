@@ -1,4 +1,3 @@
-export const GameConstants = require('./game-constants');
 export const SculptureStore = require('./sculpture-store');
 export const PanelsActionCreator = require('./actions/panels-action-creator');
 export const SculptureActionCreator = require('./actions/sculpture-action-creator');
