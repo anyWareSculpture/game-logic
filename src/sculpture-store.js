@@ -47,31 +47,39 @@ export default class SculptureStore extends events.EventEmitter {
 
   /**
    * Restores the sculpture's status back to ready
+   * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */
   restoreStatus() {
-    this.sculptureActionCreator.sendMergeState({
-      status: STATUS_READY
-    });
+    this.data.set('status', STATUS_READY);
   }
 
   /**
    * Locks the sculpture from any input
+   * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */
   lock() {
-    this.sculptureActionCreator.sendMergeState({
-      status: STATUS_LOCKED
-    });
+    this.data.set('status', STATUS_LOCKED);
   }
 
   get isLocked() {
     return this.data.get('status') === STATUS_LOCKED;
   }
 
+  publishChanges() {
+    const changes = this.data.getChangedCurrentValues();
+
+    if (Object.keys(changes).length) {
+      this.emit(SculptureStore.EVENT_CHANGE, changes);
+    }
+
+    this.data.clearChanges();
+  }
+
   _startGame(gameLogic) {
     this.currentGame = gameLogic;
     this.currentGame.start();
 
-    this._publishChanges();
+    this.publishChanges();
   }
 
   _registerDispatcher(dispatcher) {
@@ -97,17 +105,7 @@ export default class SculptureStore extends events.EventEmitter {
       this.currentGame.handleActionPayload(payload);
     }
 
-    this._publishChanges();
-  }
-
-  _publishChanges() {
-    const changes = this.data.getChangedCurrentValues();
-
-    if (Object.keys(changes).length) {
-      this.emit(SculptureStore.EVENT_CHANGE, changes);
-    }
-
-    this.data.clearChanges();
+    this.publishChanges();
   }
 
   _actionMergeState(payload) {

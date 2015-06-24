@@ -69,6 +69,7 @@ export default class MoleGameLogic {
       this.store.lock();
       setTimeout(() => {
         this.store.restoreStatus();
+        this.store.publishChanges();
       }, 2000);
       return;
     }
