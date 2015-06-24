@@ -63,6 +63,7 @@ export default class MoleGameLogic {
 
     if (targetPanelIndex >= TARGET_PANELS.length) {
       //TODO: Reached end
+      return;
     }
 
     const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
