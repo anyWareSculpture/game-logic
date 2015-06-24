@@ -38,8 +38,8 @@ export default class MoleGameLogic {
 
   handleActionPayload(payload) {
     const actionHandlers = {
-      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed,
-      [MoleGameActionCreator.ANIMATION_FINISH]: this._actionAnimationFinish
+      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [MoleGameActionCreator.ANIMATION_FINISH]: this._actionAnimationFinish.bind(this)
     };
     
     const actionHandler = actionHandlers[payload.actionType];
