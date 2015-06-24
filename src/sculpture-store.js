@@ -3,6 +3,7 @@ const events = require('events');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
+const MoleGameActionCreator = require('./actions/mole-game-action-creator');
 const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
@@ -87,10 +88,29 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _handleActionPayload(payload) {
-    if (this.isLocked && payload.actionType !== SculptureActionCreator.MERGE_STATE) {
+    if (this.isLocked && !this._actionCanRunWhenLocked(payload.actionType)) {
       return;
     }
 
+    this._delegateAction(payload);
+
+    if (this.currentGame !== null) {
+      this.currentGame.handleActionPayload(payload);
+    }
+
+    this.publishChanges();
+  }
+
+  _actionCanRunWhenLocked(actionType) {
+    const enabledActions = new Set([
+        ...SculptureActionCreator.enabledWhileSculptureLocked(),
+        ...PanelsActionCreator.enabledWhileSculptureLocked(),
+        ...MoleGameActionCreator.enabledWhileSculptureLocked()
+    ]);
+    return enabledActions.has(actionType);
+  }
+
+  _delegateAction(payload) {
     const actionHandlers = {
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this)
@@ -100,12 +120,6 @@ export default class SculptureStore extends events.EventEmitter {
     if (actionHandler) {
       actionHandler(payload);
     }
-
-    if (this.currentGame !== null) {
-      this.currentGame.handleActionPayload(payload);
-    }
-
-    this.publishChanges();
   }
 
   _actionMergeState(payload) {

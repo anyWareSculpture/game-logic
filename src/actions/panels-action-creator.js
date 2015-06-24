@@ -4,6 +4,10 @@ export default class PanelsActionCreator extends BaseActionCreator {
   // Action types
   static PANEL_PRESSED = "panel-press";
 
+  static enabledWhileSculptureLocked() {
+    return [];
+  }
+
   /**
    * Sends an action representing when a panel is pressed to the
    * dispatcher.

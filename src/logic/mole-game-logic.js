@@ -1,4 +1,5 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const MoleGameActionCreator = require('../actions/mole-game-action-creator');
 
 const TARGET_PANELS = [
   // [stripId, panelId],
@@ -13,13 +14,14 @@ const TARGET_PANELS = [
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
 
-export default class MoleGameLogic {
-  static ANIMATION_SUCCESS = "success";
+const ANIMATION_SUCCESS = "success";
+const ANIMATION_NONE = false;
 
+export default class MoleGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
     targetPanelIndex: 0,
-    animation: false
+    animation: ANIMATION_NONE
   };
 
   constructor(store) {
@@ -35,13 +37,14 @@ export default class MoleGameLogic {
   }
 
   handleActionPayload(payload) {
-    switch (payload.actionType) {
-      case PanelsActionCreator.PANEL_PRESSED:
-        this._actionPanelPressed(payload);
-        break;
-      default:
-        // Do nothing for unrecognized actions
-        break;
+    const actionHandlers = {
+      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed,
+      [MoleGameActionCreator.ANIMATION_FINISH]: this._actionAnimationFinish
+    };
+    
+    const actionHandler = actionHandlers[payload.actionType];
+    if (actionHandler) {
+      actionHandler(payload);
     }
   }
 
@@ -55,6 +58,11 @@ export default class MoleGameLogic {
       this.data.set("targetPanelIndex", targetPanelIndex + 1);
       this._enableCurrentTargetPanel();
     }
+  }
+
+  _actionAnimationFinish() {
+    this.store.restoreStatus();
+    this.data.set("animation", ANIMATION_NONE);
   }
 
   _enableCurrentTargetPanel() {
@@ -71,7 +79,7 @@ export default class MoleGameLogic {
       this._enableCurrentTargetPanel();
 
       this.store.lock();
-      this.data.set("animation", MoleGameLogic.ANIMATION_SUCCESS);
+      this.data.set("animation", ANIMATION_SUCCESS);
       return;
     }
 
