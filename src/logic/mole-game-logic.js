@@ -61,6 +61,9 @@ export default class MoleGameLogic {
     }
 
     if (targetPanelIndex >= TARGET_PANELS.length) {
+      //TODO: Refactor the contents of this if statement into multiple methods
+      this.store.data.get('lights').deactivateAll();
+
       this.data.set("targetPanelIndex", 0);
       this._enableCurrentTargetPanel();
 

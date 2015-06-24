@@ -85,6 +85,16 @@ export default class LightArray extends TrackedData {
     this.activate(stripId, panelId, false);
   }
 
+  deactivateAll(stripId=null) {
+    const targetStripIds = stripId === null ? this.stripIds : [stripId];
+
+    for (let targetStripId of targetStripIds) {
+      for (let panelId of this.get(targetStripId).panelIds) {
+        this.deactivate(targetStripId, panelId);
+      }
+    }
+  }
+
   _applyToOnePanelOrAll(panelFunc, stripId, panelId=null) {
     const panels = this._getOnePanelOrAll(stripId, panelId);
 
