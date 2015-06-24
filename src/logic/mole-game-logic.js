@@ -71,7 +71,7 @@ export default class MoleGameLogic {
       this._enableCurrentTargetPanel();
 
       this.store.lock();
-      this.data.set("animation", ANIMATION_SUCCESS);
+      this.data.set("animation", MoleGameLogic.ANIMATION_SUCCESS);
       return;
     }
 
