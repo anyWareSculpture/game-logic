@@ -2,6 +2,7 @@ const events = require('events');
 
 const MoleGameLogic = require('./logic/mole-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
+const PanelsActionCreator = require('./actions/panels-action-creator');
 const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
 
@@ -47,8 +48,16 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _handleActionPayload(payload) {
-    if (payload.actionType === SculptureActionCreator.MERGE_STATE) {
-      this._mergeState(payload);
+    switch (payload.actionType) {
+      case SculptureActionCreator.MERGE_STATE:
+        this._actionMergeState(payload);
+        break;
+      case PanelsActionCreator.PANEL_PRESSED:
+        this._actionPanelPressed(payload);
+        break;
+      default:
+        // Do nothing for unrecognized actions
+        break;
     }
 
     if (this.currentGame !== null) {
@@ -66,7 +75,12 @@ export default class SculptureStore extends events.EventEmitter {
     }
   }
 
-  _mergeState(state) {
+  _actionMergeState(state) {
     //TODO: Merge state only if properties have actually changed
+  }
+
+  _actionPanelPressed(payload) {
+    const {stripId, panelId, pressed} = payload;
+    this.data.get('lights').activate(stripId, panelId, pressed);
   }
 }

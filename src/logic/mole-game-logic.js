@@ -35,7 +35,7 @@ export default class MoleGameLogic {
   handleActionPayload(payload) {
     switch (payload.actionType) {
       case PanelsActionCreator.PANEL_PRESSED:
-        this._handlePanelPressed(payload);
+        this._actionPanelPressed(payload);
         break;
       default:
         // Do nothing for unrecognized actions
@@ -43,10 +43,8 @@ export default class MoleGameLogic {
     }
   }
 
-  _handlePanelPressed(payload) {
+  _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
-
-    this.store.data.get('lights').activate(stripId, panelId, pressed);
 
     const targetPanelIndex = this.data.get("targetPanelIndex");
     const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
