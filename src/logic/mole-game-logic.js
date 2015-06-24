@@ -14,10 +14,11 @@ const TARGET_PANELS = [
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
 
-const ANIMATION_SUCCESS = "success";
 const ANIMATION_NONE = false;
 
 export default class MoleGameLogic {
+  static ANIMATION_SUCCESS = "success";
+
   // These are automatically added to the sculpture store
   static trackedProperties = {
     targetPanelIndex: 0,
@@ -79,7 +80,7 @@ export default class MoleGameLogic {
       this._enableCurrentTargetPanel();
 
       this.store.lock();
-      this.data.set("animation", ANIMATION_SUCCESS);
+      this.data.set("animation", MoleGameLogic.ANIMATION_SUCCESS);
       return;
     }
 
