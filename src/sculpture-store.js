@@ -155,6 +155,7 @@ export default class SculptureStore extends events.EventEmitter {
           this.data.get('lights').setIntensity(stripId, panelId, panelChanges.intensity);
         }
         if (panelChanges.hasOwnProperty("active")) {
+          //TODO: Set color based on metadata
           this.data.get('lights').activate(stripId, panelId, panelChanges.active);
         }
       }
