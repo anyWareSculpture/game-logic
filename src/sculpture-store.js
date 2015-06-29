@@ -154,7 +154,7 @@ export default class SculptureStore extends events.EventEmitter {
 
   _mergeLights(lightChanges) {
     for (let stripId of Object.keys(lightChanges)) {
-      const panels = lightChanges[stripId];
+      const panels = lightChanges[stripId].panels;
       for (let panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
         if (panelChanges.hasOwnProperty("intensity")) {
