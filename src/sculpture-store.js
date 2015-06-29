@@ -4,8 +4,9 @@ const MoleGameLogic = require('./logic/mole-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const MoleGameActionCreator = require('./actions/mole-game-action-creator');
-const LightArray = require('./utils/light-array');
 const TrackedData = require('./utils/tracked-data');
+const LightArray = require('./utils/light-array');
+const Disk = require('./utils/disk');
 
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
@@ -17,14 +18,19 @@ export default class SculptureStore extends events.EventEmitter {
     super();
 
     this.data = new TrackedData({
-      'status': SculptureStore.STATUS_READY,
-      'lights': new LightArray({
+      status: SculptureStore.STATUS_READY,
+      lights: new LightArray({
         // stripId : number of panels
         '0': 10,
         '1': 10,
         '2': 10
       }),
-      'mole': new TrackedData(MoleGameLogic.trackedProperties)
+      disks: new TrackedData({
+        disk1: new Disk(),
+        disk2: new Disk(),
+        disk3: new Disk()
+      }),
+      mole: new TrackedData(MoleGameLogic.trackedProperties)
     });
 
     this.currentGame = null;
