@@ -1,6 +1,6 @@
 {
   "name": "@anyware/game-logic",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "description": "Game logic for anyWare",
   "main": "dist/index.js",
   "directories": {
@@ -30,6 +30,5 @@
     "gulp": "^3.9.0",
     "@anyware/gulp-utils": "^1.1.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
