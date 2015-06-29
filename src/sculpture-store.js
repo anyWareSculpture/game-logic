@@ -24,7 +24,7 @@ export default class SculptureStore extends events.EventEmitter {
         '0': 10,
         '1': 10,
         '2': 10
-      }),
+      }, 0, "user0"), //TODO: Proper default color based on user
       disks: new TrackedData({
         disk1: new Disk(),
         disk2: new Disk(),
