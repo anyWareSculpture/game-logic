@@ -3,11 +3,11 @@ const MoleGameActionCreator = require('../actions/mole-game-action-creator');
 
 const TARGET_PANELS = [
   // [stripId, panelId],
-  ['0', '0'],
-  ['1', '1'],
-  ['2', '2'],
-  ['1', '2'],
   ['0', '3'],
+  ['1', '3'],
+  ['2', '3'],
+  ['1', '4'],
+  ['0', '5'],
   ['2', '5']
 ];
 
