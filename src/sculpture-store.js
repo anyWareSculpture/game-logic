@@ -1,6 +1,7 @@
 const events = require('events');
 
 const MoleGameLogic = require('./logic/mole-game-logic');
+const DiskGameLogic = require('./logic/disk-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const MoleGameActionCreator = require('./actions/mole-game-action-creator');
@@ -31,6 +32,7 @@ export default class SculptureStore extends events.EventEmitter {
         disk3: new Disk()
       }),
       mole: new TrackedData(MoleGameLogic.trackedProperties)
+      disk: new TrackedData(DiskGameLogic.trackedProperties)
     });
 
     this.currentGame = null;
@@ -43,6 +45,13 @@ export default class SculptureStore extends events.EventEmitter {
    */
   startMoleGame() {
     this._startGame(new MoleGameLogic(this));
+  }
+
+  /**
+   * Starts playing the disk game and does any necessary initialization work
+   */
+  startDiskGame() {
+    this._startGame(new DiskGameLogic(this));
   }
 
   /**
