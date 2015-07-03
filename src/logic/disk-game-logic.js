@@ -1,6 +1,7 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const Disk = require('../utils/disk');
 
-const TARGET_POSITIONS_LEVELS = [
+const LEVEL_TARGET_POSITIONS = [
   {
     disk1: 10,
     disk2: 15,
@@ -17,6 +18,36 @@ const TARGET_POSITIONS_LEVELS = [
     disk3: 5
   }
 ];
+
+const CONTROL_MAPPINGS = {
+  // stripId
+  '0': {
+    // panelId
+    '3': {
+      // diskId
+      disk0: Disk.CLOCKWISE
+    },
+    '4': {
+      disk1: Disk.CLOCKWISE
+    },
+    '5': {
+      disk2: Disk.CLOCKWISE
+    }
+  },
+  '1': {
+    // panelId
+    '3': {
+      // diskId
+      disk0: Disk.COUNTERCLOCKWISE
+    },
+    '4': {
+      disk1: Disk.COUNTERCLOCKWISE
+    },
+    '5': {
+      disk2: Disk.COUNTERCLOCKWISE
+    }
+  }
+};
 
 export default class DiskGameLogic {
   // These are automatically added to the sculpture store
@@ -49,5 +80,21 @@ export default class DiskGameLogic {
 
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
+
+    if (!CONTROL_MAPPINGS.hasOwnProperty(stripId) || !CONTROL_MAPPINGS[stripId].hasOwnProperty(panelId)) {
+      return;
+    }
+
+    const disks = this.store.data.get('disks');
+    const targetDisks = CONTROL_MAPPINGS[stripId][panelId];
+    for (let diskId of Object.keys(targetDisks)) {
+      const direction = targetDisks[diskId];
+      disks.get(diskId).setDirection(direction);
+    }
+  }
+
+  get _targetPositions() {
+    const level = this.data.get("level");
+    return LEVEL_TARGET_POSITIONS[level];
   }
 }

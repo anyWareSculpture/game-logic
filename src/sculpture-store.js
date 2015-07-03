@@ -27,11 +27,11 @@ export default class SculptureStore extends events.EventEmitter {
         '2': 10
       }, 0, "user0"), //TODO: Proper default color based on user
       disks: new TrackedData({
+        disk0: new Disk(),
         disk1: new Disk(),
-        disk2: new Disk(),
-        disk3: new Disk()
+        disk2: new Disk()
       }),
-      mole: new TrackedData(MoleGameLogic.trackedProperties)
+      mole: new TrackedData(MoleGameLogic.trackedProperties),
       disk: new TrackedData(DiskGameLogic.trackedProperties)
     });
 
