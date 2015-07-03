@@ -42,7 +42,7 @@ export default class MoleGameLogic {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [MoleGameActionCreator.ANIMATION_FINISH]: this._actionAnimationFinish.bind(this)
     };
-    
+
     const actionHandler = actionHandlers[payload.actionType];
     if (actionHandler) {
       actionHandler(payload);

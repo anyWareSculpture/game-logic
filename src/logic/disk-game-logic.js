@@ -71,7 +71,7 @@ export default class DiskGameLogic {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this)
     };
-    
+
     const actionHandler = actionHandlers[payload.actionType];
     if (actionHandler) {
       actionHandler(payload);

@@ -100,7 +100,6 @@ export default class TrackedData {
     for (let propName of this._changedTrackedDataProperties()) {
       this.get(propName).clearChanges();
     }
-
   }
 
   *_changedTrackedDataProperties() {
