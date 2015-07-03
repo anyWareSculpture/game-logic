@@ -46,6 +46,13 @@ export default class TrackedData {
   }
 
   /**
+   * @returns {Boolean} Returns whether the given name is a valid name for this store. If no valid names were provided initially, this always returns true since then any name is valid
+   */
+  has(name) {
+    return this._validPropertiesNames ? this._validPropertiesNames.has(name) : true;
+  }
+
+  /**
    * Iterates through the names of the properties that have changed
    */
   *getChangedPropertyNames() {
@@ -114,7 +121,7 @@ export default class TrackedData {
   }
 
   _assertValidProperty(name) {
-    if (this._validPropertiesNames && !this._validPropertiesNames.has(name)) {
+    if (!this.has(name)) {
       throw new Error("Cannot retrieve property '" + name + "'");
     }
   }
