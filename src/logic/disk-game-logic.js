@@ -3,21 +3,23 @@ const DisksActionCreator = require('../actions/disks-action-creator');
 
 const Disk = require('../utils/disk');
 
+const ANIMATION_NONE = false;
+
 const LEVEL_TARGET_POSITIONS = [
   {
+    disk0: 10,
+    disk1: 15,
+    disk2: 20
+  },
+  {
+    disk0: 5,
     disk1: 10,
-    disk2: 15,
-    disk3: 20
+    disk2: 15
   },
   {
-    disk1: 5,
-    disk2: 10,
-    disk3: 15
-  },
-  {
-    disk1: 2,
-    disk2: 3,
-    disk3: 5
+    disk0: 2,
+    disk1: 3,
+    disk2: 5
   }
 ];
 
@@ -52,9 +54,12 @@ const CONTROL_MAPPINGS = {
 };
 
 export default class DiskGameLogic {
+  static ANIMATION_SUCCESS = "success";
+
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    level: 0
+    level: 0,
+    animation: ANIMATION_NONE
   };
 
   constructor(store) {
@@ -111,6 +116,26 @@ export default class DiskGameLogic {
     if (typeof state !== 'undefined') {
       disk.setState(state);
     }
+    
+    this._checkWinConditions(disks);
+  }
+
+  _checkWinConditions(disks) {
+    for (let diskId of Object.keys(this._targetPositions)) {
+      const targetPosition = this._targetPositions[diskId];
+      if (disks.get(diskId).getPosition() !== targetPosition) {
+        return false;
+      }
+    }
+
+    this._winGame();
+  }
+
+  _winGame() {
+    this.store.data.get('lights').deactivateAll();
+    this.store.lock();
+
+    this.data.set("animation", DiskGameLogic.ANIMATION_SUCCESS);
   }
 
   get _targetPositions() {
