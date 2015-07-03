@@ -5,6 +5,7 @@ const DiskGameLogic = require('./logic/disk-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const MoleGameActionCreator = require('./actions/mole-game-action-creator');
+const DiskGameActionCreator = require('./actions/disk-game-action-creator');
 const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
@@ -121,6 +122,7 @@ export default class SculptureStore extends events.EventEmitter {
         ...SculptureActionCreator.enabledWhileSculptureLocked(),
         ...PanelsActionCreator.enabledWhileSculptureLocked(),
         ...MoleGameActionCreator.enabledWhileSculptureLocked()
+        ...DiskGameActionCreator.enabledWhileSculptureLocked()
     ]);
     return enabledActions.has(actionType);
   }

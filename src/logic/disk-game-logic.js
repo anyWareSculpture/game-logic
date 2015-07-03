@@ -1,4 +1,6 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const DisksActionCreator = require('../actions/disks-action-creator');
+
 const Disk = require('../utils/disk');
 
 const LEVEL_TARGET_POSITIONS = [
@@ -69,7 +71,8 @@ export default class DiskGameLogic {
 
   handleActionPayload(payload) {
     const actionHandlers = {
-      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this)
+      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -90,6 +93,23 @@ export default class DiskGameLogic {
     for (let diskId of Object.keys(targetDisks)) {
       const direction = targetDisks[diskId];
       disks.get(diskId).setDirection(direction);
+    }
+  }
+
+  _actionDiskUpdate(payload) {
+    const {diskId, position, direction, state} = payload;
+
+    const disks = this.store.data.get('disks');
+    const disk = disks.get(diskId);
+    
+    if (typeof position !== 'undefined') {
+      disk.rotateTo(position);
+    }
+    if (typeof direction !== 'undefined') {
+      disk.setDirection(direction);
+    }
+    if (typeof state !== 'undefined') {
+      disk.setState(state);
     }
   }
 
