@@ -121,7 +121,7 @@ export default class SculptureStore extends events.EventEmitter {
     const enabledActions = new Set([
         ...SculptureActionCreator.enabledWhileSculptureLocked(),
         ...PanelsActionCreator.enabledWhileSculptureLocked(),
-        ...MoleGameActionCreator.enabledWhileSculptureLocked()
+        ...MoleGameActionCreator.enabledWhileSculptureLocked(),
         ...DiskGameActionCreator.enabledWhileSculptureLocked()
     ]);
     return enabledActions.has(actionType);

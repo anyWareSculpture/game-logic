@@ -106,7 +106,7 @@ export default class DiskGameLogic {
 
     const disks = this.store.data.get('disks');
     const disk = disks.get(diskId);
-    
+
     if (typeof position !== 'undefined') {
       disk.rotateTo(position);
     }
@@ -116,7 +116,7 @@ export default class DiskGameLogic {
     if (typeof state !== 'undefined') {
       disk.setState(state);
     }
-    
+
     this._checkWinConditions(disks);
   }
 

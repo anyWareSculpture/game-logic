@@ -47,6 +47,7 @@ export default class TrackedData {
 
   /**
    * @returns {Boolean} Returns whether the given name is a valid name for this store. If no valid names were provided initially, this always returns true since then any name is valid
+   * @param {String} name - The name of the property to check
    */
   has(name) {
     return this._validPropertiesNames ? this._validPropertiesNames.has(name) : true;
