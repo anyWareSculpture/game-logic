@@ -110,6 +110,15 @@ export default class TrackedData {
     }
   }
 
+  /**
+   * Iterates through all the data property names currently defined
+   */
+  *[Symbol.iterator]() {
+    for (let name of Object.keys(this._data)) {
+      yield name;
+    }
+  }
+
   *_changedTrackedDataProperties() {
     for (let propName of Object.keys(this._data)) {
       const value = this.get(propName);
