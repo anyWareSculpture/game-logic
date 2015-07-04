@@ -5,3 +5,4 @@ export const SculptureActionCreator = require('./actions/sculpture-action-creato
 export const MoleGameActionCreator = require('./actions/mole-game-action-creator');
 export const MoleGameLogic = require('./logic/mole-game-logic');
 export const DiskGameLogic = require('./logic/mole-game-logic');
+export const Disk = require('./utils/disk');
