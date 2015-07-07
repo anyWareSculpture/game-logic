@@ -4,6 +4,7 @@ const DisksActionCreator = require('../actions/disks-action-creator');
 const Disk = require('../utils/disk');
 
 const ANIMATION_NONE = false;
+const DEFAULT_LEVEL = 0;
 
 const LEVEL_TARGET_POSITIONS = [
   {
@@ -58,7 +59,7 @@ export default class DiskGameLogic {
 
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    level: 0,
+    level: DEFAULT_LEVEL,
     animation: ANIMATION_NONE
   };
 
@@ -71,7 +72,7 @@ export default class DiskGameLogic {
   }
 
   start() {
-    this._enableCurrentTargetPanel();
+    this.data.set('level', DEFAULT_LEVEL);
   }
 
   handleActionPayload(payload) {
@@ -95,9 +96,15 @@ export default class DiskGameLogic {
 
     const disks = this.store.data.get('disks');
     const targetDisks = CONTROL_MAPPINGS[stripId][panelId];
+    
     for (let diskId of Object.keys(targetDisks)) {
-      const direction = targetDisks[diskId];
-      disks.get(diskId).setDirection(direction);
+      if (pressed) {
+        const direction = targetDisks[diskId];
+        disks.get(diskId).setDirection(direction);
+      }
+      else {
+        disks.get(diskId).setDirection(Disk.STOPPED);
+      }
     }
   }
 

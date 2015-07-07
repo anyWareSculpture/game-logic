@@ -10,6 +10,12 @@ const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
 
+const HARDWARE_TO_DISK_DIRECTION_MAP = {
+  "-1": Disk.CLOCKWISE,
+  "1": Disk.COUNTERCLOCKWISE,
+  "0": Disk.STOPPED
+};
+
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
 
@@ -130,7 +136,8 @@ export default class SculptureStore extends events.EventEmitter {
   _delegateAction(payload) {
     const actionHandlers = {
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
-      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this)
+      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -143,6 +150,7 @@ export default class SculptureStore extends events.EventEmitter {
     const mergeFunctions = {
       status: this._mergeStatus.bind(this),
       lights: this._mergeLights.bind(this),
+      disks: this._mergeDisks.bind(this),
       mole: this._mergeMole.bind(this)
     };
 
@@ -157,6 +165,30 @@ export default class SculptureStore extends events.EventEmitter {
   _actionPanelPressed(payload) {
     const {stripId, panelId, pressed} = payload;
     this.data.get('lights').activate(stripId, panelId, pressed);
+  }
+
+  _actionDiskUpdate(payload) {
+    let {diskId, position, direction, user} = payload;
+
+    if (typeof diskId === 'undefined') {
+      return;
+    }
+
+    const disk = this.data.get('disks').get(diskId);
+
+    position = parseInt(position);
+    if (!isNaN(parseFloat(position)) && isFinite(position)) {
+      disk.rotateTo(position);
+    }
+
+    direction = this._parseHardwareDiskDirection(direction);
+    if (typeof direction !== 'undefined') {
+      disk.setDirection(direction);
+    }
+
+    if (typeof user !== 'undefined' && user !== null) {
+      disk.setUser(user);
+    }
   }
 
   _mergeStatus(newStatus) {
@@ -179,9 +211,18 @@ export default class SculptureStore extends events.EventEmitter {
     }
   }
 
+  _mergeDisks(diskChanges) {
+    //TODO
+    console.log(diskChanges);
+  }
+
   _mergeMole(moleChanges) {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
+  }
+
+  _parseHardwareDiskDirection(direction) {
+    return HARDWARE_TO_DISK_DIRECTION_MAP[direction];
   }
 }

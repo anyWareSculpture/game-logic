@@ -16,15 +16,15 @@ export default class DisksActionCreator extends BaseActionCreator {
   sendDiskUpdate(diskId, {position=null, direction=null, state=null}) {
     const payloadBody = {};
     if (position !== null) {
-      payloadBody[position] = position;
+      payloadBody.position = position;
     }
 
     if (direction !== null) {
-      payloadBody[direction] = direction;
+      payloadBody.direction = direction;
     }
 
     if (state !== null) {
-      payloadBody[state] = state;
+      payloadBody.state = state;
     }
 
     if (Object.keys(payloadBody).length > 0) {
