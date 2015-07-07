@@ -10,12 +10,6 @@ const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
 
-const HARDWARE_TO_DISK_DIRECTION_MAP = {
-  "-1": Disk.CLOCKWISE,
-  "1": Disk.COUNTERCLOCKWISE,
-  "0": Disk.STOPPED
-};
-
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
 
@@ -176,12 +170,10 @@ export default class SculptureStore extends events.EventEmitter {
 
     const disk = this.data.get('disks').get(diskId);
 
-    position = parseInt(position);
-    if (!isNaN(parseFloat(position)) && isFinite(position)) {
+    if (typeof position !== 'undefined') {
       disk.rotateTo(position);
     }
 
-    direction = this._parseHardwareDiskDirection(direction);
     if (typeof direction !== 'undefined') {
       disk.setDirection(direction);
     }
@@ -220,9 +212,5 @@ export default class SculptureStore extends events.EventEmitter {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
-  }
-
-  _parseHardwareDiskDirection(direction) {
-    return HARDWARE_TO_DISK_DIRECTION_MAP[direction];
   }
 }
