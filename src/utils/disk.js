@@ -57,7 +57,7 @@ export default class Disk extends TrackedData {
       this.setDirection(opposite);
     }
     else {
-      throw new Error(`Could not reason about how to unset direction '${direction}' from current direction '${direction}'`);
+      throw new Error(`Could not reason about how to unset direction '${direction}' from current direction '${currentDirection}'`);
     }
   }
 
@@ -106,8 +106,7 @@ export default class Disk extends TrackedData {
   }
 
   static conflictsWith(direction1, direction2) {
-    return ((direction1 === Disk.CLOCKWISE && direction2 === Disk.COUNTERCLOCKWISE)
-        || (direction1 === Disk.COUNTERCLOSEWISE && direction2 === Disk.CLOCKWISE));
+    return (direction1 === Disk.CLOCKWISE && direction2 === Disk.COUNTERCLOCKWISE) || (direction1 === Disk.COUNTERCLOCKWISE && direction2 === Disk.CLOCKWISE);
   }
 
   static oppositeDirection(direction) {
@@ -115,7 +114,7 @@ export default class Disk extends TrackedData {
       return Disk.COUNTERCLOCKWISE;
     }
     else if (direction === Disk.COUNTERCLOCKWISE) {
-      return Disk.COUNTERCLOCKWISE;
+      return Disk.CLOCKWISE;
     }
     else {
       throw new Error(`Cannot resolve opposite for direction '${direction}'`);
