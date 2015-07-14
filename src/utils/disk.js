@@ -40,6 +40,13 @@ export default class Disk extends TrackedData {
     }
   }
 
+  /**
+   * Un-applies a direction (instead of directly setting it)
+   * Resolves conflicts when they are present
+   * @param {String} direction - Static direction constant from Disk
+   *    In general, this function should only be used with the
+   *    CLOCKWISE and COUNTERCLOCKWISE directions
+   */
   unsetDirection(direction) {
     const currentDirection = this.getDirection();
     if (currentDirection === direction) {
