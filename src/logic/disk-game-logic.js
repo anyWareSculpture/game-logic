@@ -98,12 +98,12 @@ export default class DiskGameLogic {
     const targetDisks = CONTROL_MAPPINGS[stripId][panelId];
     
     for (let diskId of Object.keys(targetDisks)) {
+      const direction = targetDisks[diskId];
       if (pressed) {
-        const direction = targetDisks[diskId];
         disks.get(diskId).setDirection(direction);
       }
       else {
-        disks.get(diskId).setDirection(Disk.STOPPED);
+        disks.get(diskId).unsetDirection(direction);
       }
     }
   }

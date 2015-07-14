@@ -4,6 +4,7 @@ export default class Disk extends TrackedData {
   static STOPPED = "stopped";
   static CLOCKWISE = "clockwise";
   static COUNTERCLOCKWISE = "counterclockwise";
+  static CONFLICT = "conflict"
 
   static STATE_HOMING = "homing";
   static STATE_READY = "ready";
@@ -25,8 +26,32 @@ export default class Disk extends TrackedData {
     return this.get('position');
   }
 
+  /**
+   * Applies the given direction to the disk, sometimes resulting in a conflict if direction opposes the current direction
+   * @param {String} direction - Static direction constant from Disk
+   */
   setDirection(direction) {
-    this.set('direction', direction);
+    const currentDirection = this.getDirection();
+    if (Disk.conflictsWith(currentDirection, direction)) {
+      this.setDirectionConflict();
+    }
+    else {
+      this.set('direction', direction);
+    }
+  }
+
+  unsetDirection(direction) {
+    const currentDirection = this.getDirection();
+    if (currentDirection === direction) {
+      this.stop();
+    }
+    else if (currentDirection === Disk.CONFLICT) {
+      const opposite = Disk.oppositeDirection(direction);
+      this.setDirection(opposite);
+    }
+    else {
+      throw new Error(`Could not reason about how to unset direction '${direction}' from current direction '${direction}'`);
+    }
   }
 
   turnClockwise() {
@@ -39,6 +64,18 @@ export default class Disk extends TrackedData {
 
   stop() {
     this.setDirection(Disk.STOPPED);
+  }
+
+  setDirectionConflict() {
+    this.setDirection(Disk.CONFLICT);
+  }
+
+  get isStopped() {
+    return this.getDirection() === Disk.STOPPED;
+  }
+
+  get isConflicting() {
+    return this.getDirection() === Disk.CONFLICT;
   }
 
   getDirection() {
@@ -59,5 +96,22 @@ export default class Disk extends TrackedData {
 
   getState() {
     return this.get('state');
+  }
+
+  static conflictsWith(direction1, direction2) {
+    return ((direction1 === Disk.CLOCKWISE && direction2 === Disk.COUNTERCLOCKWISE)
+        || (direction1 === Disk.COUNTERCLOSEWISE && direction2 === Disk.CLOCKWISE));
+  }
+
+  static oppositeDirection(direction) {
+    if (direction === Disk.CLOCKWISE) {
+      return Disk.COUNTERCLOCKWISE;
+    }
+    else if (direction === Disk.COUNTERCLOCKWISE) {
+      return Disk.COUNTERCLOCKWISE;
+    }
+    else {
+      throw new Error(`Cannot resolve opposite for direction '${direction}'`);
+    }
   }
 }
