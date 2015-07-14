@@ -35,3 +35,7 @@ gulp.task('default', function(callback) {
   return runSequence('lint', 'test', 'build', callback);
 });
 
+gulp.task('watch', ['build'], function watch() {
+  gulp.watch('src/**/*.js', ['build']);
+});
+
