@@ -1,6 +1,6 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 
-PATTERN_LEVELS = [
+const PATTERN_LEVELS = [
   // level 0 sequence
   [
     // sequence step = {stripId: {panelId: active}}
