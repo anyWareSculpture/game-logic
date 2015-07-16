@@ -34,8 +34,8 @@ export default class SculptureStore extends events.EventEmitter {
         disk2: new Disk()
       }),
       mole: new TrackedData(MoleGameLogic.trackedProperties),
-      disk: new TrackedData(DiskGameLogic.trackedProperties)
-      disk: new TrackedData(SimonGameLogic.trackedProperties)
+      disk: new TrackedData(DiskGameLogic.trackedProperties),
+      simon: new TrackedData(SimonGameLogic.trackedProperties)
     });
 
     this.currentGame = null;
