@@ -16,6 +16,8 @@ export default class SculptureStore extends events.EventEmitter {
 
   static STATUS_READY = "ready";
   static STATUS_LOCKED = "locked";
+  static STATUS_SUCCESS = "success";
+  static STATUS_FAILURE = "failure";
 
   static GAME_MOLE = "mole";
   static GAME_DISK = "disk";
@@ -26,6 +28,8 @@ export default class SculptureStore extends events.EventEmitter {
 
     this.data = new TrackedData({
       status: SculptureStore.STATUS_READY,
+      panelAnimation: null,
+      currentGame: null,
       lights: new LightArray({
         // stripId : number of panels
         '0': 10,
@@ -37,7 +41,6 @@ export default class SculptureStore extends events.EventEmitter {
         disk1: new Disk(),
         disk2: new Disk()
       }),
-      currentGame: null,
       mole: new TrackedData(MoleGameLogic.trackedProperties),
       disk: new TrackedData(DiskGameLogic.trackedProperties),
       simon: new TrackedData(SimonGameLogic.trackedProperties)
