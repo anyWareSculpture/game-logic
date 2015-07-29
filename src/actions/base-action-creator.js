@@ -13,8 +13,4 @@ export default class BaseActionCreator {
       actionType: actionType
     }, data));
   }
-
-  static enabledWhileSculptureLocked() {
-    throw new Error("Not implemented");
-  }
 }

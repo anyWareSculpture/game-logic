@@ -44,31 +44,24 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
-   * Starts playing the mole game and does any necessary initialization work
-   */
-  startMoleGame() {
-    this._startGame(new MoleGameLogic(this));
-  }
-
-  /**
-   * Starts playing the disk game and does any necessary initialization work
-   */
-  startDiskGame() {
-    this._startGame(new DiskGameLogic(this));
-  }
-
-  /**
-   * Starts playing the simon game and does any necessary initialization work
-   */
-  startSimonGame() {
-    this._startGame(new SimonGameLogic(this));
-  }
-
-  /**
    * @returns {Boolean} Returns whether the mole game is currently being played
    */
   get isPlayingMoleGame() {
     return this.currentGame instanceof MoleGameLogic;
+  }
+
+  /**
+   * @returns {Boolean} Returns whether the disk game is currently being played
+   */
+  get isPlayingDiskGame() {
+    return this.currentGame instanceof DiskGameLogic;
+  }
+
+  /**
+   * @returns {Boolean} Returns whether the simon game is currently being played
+   */
+  get isPlayingSimonGame() {
+    return this.currentGame instanceof SimonGameLogic;
   }
 
   /**
@@ -128,16 +121,15 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionCanRunWhenLocked(actionType) {
     const enabledActions = new Set([
-        ...SculptureActionCreator.enabledWhileSculptureLocked(),
-        ...PanelsActionCreator.enabledWhileSculptureLocked(),
-        ...MoleGameActionCreator.enabledWhileSculptureLocked(),
-        ...DisksActionCreator.enabledWhileSculptureLocked()
+      SculptureActionCreator.MERGE_STATE,
+      MoleGameActionCreator.ANIMATION_FINISH
     ]);
     return enabledActions.has(actionType);
   }
 
   _delegateAction(payload) {
     const actionHandlers = {
+      [SculptureActionCreator.START_GAME]: this._actionStartGame.bind(this),
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
@@ -147,6 +139,21 @@ export default class SculptureStore extends events.EventEmitter {
     if (actionHandler) {
       actionHandler(payload);
     }
+  }
+
+  _actionStartGame(payload) {
+    const game_logic_classes = {
+      [SculptureActionCreator.GAME_MOLE]: MoleGameLogic,
+      [SculptureActionCreator.GAME_DISK]: DiskGameLogic,
+      [SculptureActionCreator.GAME_SIMON]: SimonGameLogic
+    };
+
+    const GameLogic = game_logic_classes[payload.game];
+    if (!GameLogic) {
+      throw new Error(`Unrecognized game: ${payload.game}`);
+    }
+
+    this._startGame(new GameLogic(this));
   }
 
   _actionMergeState(payload) {

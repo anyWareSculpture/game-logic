@@ -4,10 +4,6 @@ export default class DisksActionCreator extends BaseActionCreator {
   // Action types
   static DISK_UPDATE = "disk-update";
 
-  static enabledWhileSculptureLocked() {
-    return [];
-  }
-
   /**
    * Sends an action to the dispatcher representing when a disk position, direction, or state changes.
    * Only sends action if at least one argument is provided to the object
