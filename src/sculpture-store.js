@@ -17,6 +17,10 @@ export default class SculptureStore extends events.EventEmitter {
   static STATUS_READY = "ready";
   static STATUS_LOCKED = "locked";
 
+  static GAME_MOLE = "mole";
+  static GAME_DISK = "disk";
+  static GAME_SIMON = "simon";
+
   constructor(dispatcher) {
     super();
 
@@ -33,6 +37,7 @@ export default class SculptureStore extends events.EventEmitter {
         disk1: new Disk(),
         disk2: new Disk()
       }),
+      currentGame: null,
       mole: new TrackedData(MoleGameLogic.trackedProperties),
       disk: new TrackedData(DiskGameLogic.trackedProperties),
       simon: new TrackedData(SimonGameLogic.trackedProperties)
@@ -84,11 +89,10 @@ export default class SculptureStore extends events.EventEmitter {
     return this.data.get('status') === SculptureStore.STATUS_LOCKED;
   }
 
-  _startGame(gameLogic) {
+  _startGame(game, gameLogic) {
+    this.data.set('currentGame', game);
     this.currentGame = gameLogic;
     this.currentGame.start();
-
-    this._publishChanges();
   }
 
   _publishChanges() {
@@ -147,13 +151,19 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.GAME_DISK]: DiskGameLogic,
       [SculptureActionCreator.GAME_SIMON]: SimonGameLogic
     };
+    const games = {
+      [SculptureActionCreator.GAME_MOLE]: SculptureStore.GAME_MOLE,
+      [SculptureActionCreator.GAME_DISK]: SculptureStore.GAME_DISK,
+      [SculptureActionCreator.GAME_SIMON]: SculptureStore.GAME_SIMON
+    };
 
+    const game = games[payload.game];
     const GameLogic = game_logic_classes[payload.game];
-    if (!GameLogic) {
+    if (!game || !GameLogic) {
       throw new Error(`Unrecognized game: ${payload.game}`);
     }
 
-    this._startGame(new GameLogic(this));
+    this._startGame(game, new GameLogic(this));
   }
 
   _actionMergeState(payload) {
