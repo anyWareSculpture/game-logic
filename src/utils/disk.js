@@ -85,6 +85,14 @@ export default class Disk extends TrackedData {
     return this.getDirection() === Disk.CONFLICT;
   }
 
+  get isTurningClockwise() {
+    return this.getDirection() === Disk.CLOCKWISE;
+  }
+
+  get isTurningCounterclockwise() {
+    return this.getDirection() === Disk.COUNTERCLOCKWISE;
+  }
+
   getDirection() {
     return this.get('direction');
   }
