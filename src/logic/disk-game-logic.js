@@ -5,8 +5,10 @@ const Disk = require('../utils/disk');
 
 const DEFAULT_LEVEL = 0;
 
-const LEVEL_TARGET_POSITIONS = [
+const TARGET_POSITIONS_LEVELS = [
+  // level 0
   {
+    // diskId: target position
     disk0: 10,
     disk1: 15,
     disk2: 20
@@ -54,8 +56,6 @@ const CONTROL_MAPPINGS = {
 };
 
 export default class DiskGameLogic {
-  static ANIMATION_SUCCESS = "success";
-
   // These are automatically added to the sculpture store
   static trackedProperties = {
     level: DEFAULT_LEVEL
@@ -145,8 +145,13 @@ export default class DiskGameLogic {
 
     this.store.setSuccessStatus();
 
-    const level = this.data.get('level');
-    this.data.set('level', level + 1);
+    let level = this.data.get('level') + 1;
+    if (level >= this._levels) {
+      //TODO: Move on to the next game
+      level = 0;
+    }
+
+    this.data.set('level', level);
   }
 
   _stopAllDisks() {
@@ -159,6 +164,10 @@ export default class DiskGameLogic {
 
   get _targetPositions() {
     const level = this.data.get("level");
-    return LEVEL_TARGET_POSITIONS[level];
+    return TARGET_POSITIONS_LEVELS[level];
+  }
+
+  get _levels() {
+    return TARGET_POSITIONS_LEVELS.length;
   }
 }
