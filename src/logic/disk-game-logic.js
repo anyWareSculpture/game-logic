@@ -98,11 +98,12 @@ export default class DiskGameLogic {
     
     for (let diskId of Object.keys(targetDisks)) {
       const direction = targetDisks[diskId];
+      const disk = disks.get(diskId);
       if (pressed) {
-        disks.get(diskId).setDirection(direction);
+        disk.setDirection(direction);
       }
-      else {
-        disks.get(diskId).unsetDirection(direction);
+      else if (!disk.isStopped) {
+        disk.unsetDirection(direction);
       }
     }
   }
@@ -139,8 +140,17 @@ export default class DiskGameLogic {
 
   _winGame() {
     this.store.data.get('lights').deactivateAll();
+    this._stopAllDisks();
 
     this.store.setSuccessStatus();
+  }
+
+  _stopAllDisks() {
+    const disks = this.store.data.get('disks');
+
+    for (let diskId of disks) {
+      disks.get(diskId).stop();
+    }
   }
 
   get _targetPositions() {
