@@ -14,19 +14,16 @@ const TARGET_PANELS = [
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
 
-const ANIMATION_NONE = false;
-
 export default class MoleGameLogic {
-  static ANIMATION_SUCCESS = "success";
-
   // These are automatically added to the sculpture store
   static trackedProperties = {
     targetPanelIndex: 0,
-    animation: ANIMATION_NONE
   };
 
   constructor(store) {
     this.store = store;
+    
+    this._complete = false;
   }
 
   get data() {
@@ -34,13 +31,17 @@ export default class MoleGameLogic {
   }
 
   start() {
+    this.data.set("targetPanelIndex", 0);
     this._enableCurrentTargetPanel();
   }
 
   handleActionPayload(payload) {
+    if (this._complete) {
+      return;
+    }
+
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [MoleGameActionCreator.ANIMATION_FINISH]: this._actionAnimationFinish.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -61,11 +62,6 @@ export default class MoleGameLogic {
     }
   }
 
-  _actionAnimationFinish() {
-    this.store.restoreStatus();
-    this.data.set("animation", ANIMATION_NONE);
-  }
-
   _enableCurrentTargetPanel() {
     const targetPanelIndex = this.data.get("targetPanelIndex");
     if (targetPanelIndex > 0) {
@@ -73,14 +69,7 @@ export default class MoleGameLogic {
     }
 
     if (targetPanelIndex >= TARGET_PANELS.length) {
-      //TODO: Refactor the contents of this if statement into multiple methods
-      this.store.data.get('lights').deactivateAll();
-
-      this.data.set("targetPanelIndex", 0);
-      this._enableCurrentTargetPanel();
-
-      this.store.lock();
-      this.data.set("animation", MoleGameLogic.ANIMATION_SUCCESS);
+      this._winGame();
       return;
     }
 
@@ -103,5 +92,11 @@ export default class MoleGameLogic {
 
   _getTargetPanel(index) {
     return TARGET_PANELS[index];
+  }
+
+  _winGame() {
+    this._complete = true;
+    this.store.data.get('lights').deactivateAll();
+    this.store.setSuccessStatus();
   }
 }

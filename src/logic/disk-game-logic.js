@@ -3,7 +3,6 @@ const DisksActionCreator = require('../actions/disks-action-creator');
 
 const Disk = require('../utils/disk');
 
-const ANIMATION_NONE = false;
 const DEFAULT_LEVEL = 0;
 
 const LEVEL_TARGET_POSITIONS = [
