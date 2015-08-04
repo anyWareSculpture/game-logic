@@ -88,6 +88,20 @@ export default class SculptureStore extends events.EventEmitter {
     this.data.set('status', SculptureStore.STATUS_LOCKED);
   }
 
+  /**
+   * Sets the sculpture's status to success
+   */
+  setSuccessStatus() {
+    this.data.set('status', SculptureStore.STATUS_SUCCESS);
+  }
+
+  /**
+   * Sets the sculpture's status to failure
+   */
+  setFailureStatus() {
+    this.data.set('status', SculptureStore.STATUS_FAILURE);
+  }
+
   get isLocked() {
     return this.data.get('status') === SculptureStore.STATUS_LOCKED;
   }

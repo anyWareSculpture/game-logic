@@ -59,8 +59,7 @@ export default class DiskGameLogic {
 
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    level: DEFAULT_LEVEL,
-    animation: ANIMATION_NONE
+    level: DEFAULT_LEVEL
   };
 
   constructor(store) {
@@ -140,9 +139,8 @@ export default class DiskGameLogic {
 
   _winGame() {
     this.store.data.get('lights').deactivateAll();
-    this.store.lock();
 
-    this.data.set("animation", DiskGameLogic.ANIMATION_SUCCESS);
+    this.store.setSuccessStatus();
   }
 
   get _targetPositions() {
