@@ -13,14 +13,14 @@ export default class Animation {
   /**
    * @returns {Boolean} If the animation is currently running
    */
-  get running() {
+  get isRunning() {
     return this.state === Animation.RUNNING;
   }
 
   /**
    * @returns {Boolean} If the animation is currently stopped
    */
-  get stopped() {
+  get isStopped() {
     return this.state === Animation.STOPPED;
   }
 
@@ -64,8 +64,16 @@ export default class Animation {
   playNextFrame() {
     this.currentFrame++;
     
-    if (this.currentFrame > frames.length) {
-      
+    if (this.currentFrame >= this.frames.length || this.isStopped) {
+      this.after();
+    }
+    else {
+      const frame = this.frames[this.currentFrame];
+      setTimeout(() => {
+        frame.run();
+
+        this.playNextFrame();
+      }, frame.timeOffset);
     }
   }
 }

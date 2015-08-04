@@ -14,6 +14,5 @@ export default class Frame {
    * Runs the frame
    */
   run() {
-
   }
 }
