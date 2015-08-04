@@ -152,6 +152,7 @@ export default class SculptureStore extends events.EventEmitter {
     const actionHandlers = {
       [SculptureActionCreator.START_GAME]: this._actionStartGame.bind(this),
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
+      [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -197,6 +198,10 @@ export default class SculptureStore extends events.EventEmitter {
         mergeFunction(payload[propName]);
       }
     }
+  }
+
+  _actionRestoreStatus(payload) {
+    this.restoreStatus();
   }
 
   _actionPanelPressed(payload) {

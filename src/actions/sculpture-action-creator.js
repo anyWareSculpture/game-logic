@@ -4,6 +4,7 @@ export default class SculptureActionCreator extends BaseActionCreator {
   // Action types
   static MERGE_STATE = "merge-state";
   static START_GAME = "start-game";
+  static RESTORE_STATUS = "restore-status";
 
   static GAME_MOLE = "mole";
   static GAME_DISK = "disk";
@@ -33,6 +34,10 @@ export default class SculptureActionCreator extends BaseActionCreator {
 
   sendStartSimonGame() {
     this.sendGame(SculptureActionCreator.GAME_SIMON);
+  }
+
+  sendRestoreStatus() {
+    this._dispatch(SculptureActionCreator.RESTORE_STATUS);
   }
 }
 
