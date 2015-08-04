@@ -143,6 +143,9 @@ export default class DiskGameLogic {
     this._stopAllDisks();
 
     this.store.setSuccessStatus();
+
+    const level = this.data.get('level');
+    this.data.set('level', level + 1);
   }
 
   _stopAllDisks() {
