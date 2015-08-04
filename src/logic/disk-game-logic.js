@@ -124,7 +124,9 @@ export default class DiskGameLogic {
       disk.setState(state);
     }
 
-    this._checkWinConditions(disks);
+    if (!this.store.isStatusSuccess) {
+      this._checkWinConditions(disks);
+    }
   }
 
   _checkWinConditions(disks) {
