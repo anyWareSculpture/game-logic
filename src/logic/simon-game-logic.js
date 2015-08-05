@@ -1,4 +1,6 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const PanelAnimation = require('../animation/panel-animation');
+const ZeroFrame = require('../animation/zero-frame');
 
 const PATTERN_LEVELS = [
   // level 0 sequence
@@ -28,15 +30,10 @@ const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
 const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
 
-const ANIMATION_NONE = false;
-
 export default class SimonGameLogic {
-  static ANIMATION_SUCCESS = "success";
-
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    level: 0,
-    levelPosition: 0
+    level: 0
   };
 
   constructor(store) {
@@ -52,6 +49,7 @@ export default class SimonGameLogic {
   }
 
   start() {
+    this.data.set('level', 0);
     this._playCurrentSequence();
   }
 
@@ -68,6 +66,7 @@ export default class SimonGameLogic {
 
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
+    //TODO
   }
 
   _playCurrentSequence() {
@@ -78,13 +77,25 @@ export default class SimonGameLogic {
   }
 
   _playSequence(sequence) {
-    let frameIndex = -1;
-    const playNextFrame = () => {
-      frameIndex += 1;
+    const frames = [for (step of sequence) this._makeFrame(step)];
+    const animation = new PanelAnimation(frames, this._finishPlaySequence.bind(this));
 
-      const frame = sequence[frame];
-    };
+    this.store.playAnimation(animation);
+  }
 
-    playNextFrame();
+  _makeFrame(step) {
+    return new ZeroFrame(this._lights, () => {
+      for (let stripId of Object.keys(step)) {
+        const panels = step[stripId];
+        for (let panelId of Object.keys(panels)) {
+          const intensity = panels[panelId] ? TARGET_PANEL_INTENSITY : PANEL_OFF_INTENSITY;
+          this._lights.setIntensity(stripId, panelId, intensity);
+        }
+      }
+    }, SEQUENCE_ANIMATION_FRAME_DELAY);
+  }
+
+  _finishPlaySequence() {
   }
 }
+

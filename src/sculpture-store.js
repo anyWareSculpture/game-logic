@@ -47,8 +47,9 @@ export default class SculptureStore extends events.EventEmitter {
     });
 
     this.currentGame = null;
-    this.dispatchToken = this._registerDispatcher(dispatcher);
-    this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
+    this.dispatcher = dispatcher;
+    this.dispatchToken = this._registerDispatcher(this.dispatcher);
+    this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
   }
 
   /**
@@ -116,6 +117,14 @@ export default class SculptureStore extends events.EventEmitter {
     return this.data.get('status') === SculptureStore.STATUS_SUCCESS;
   }
 
+  /**
+   * Plays the given animation
+   */
+  playAnimation(animation) {
+    this.data.set('panelAnimation', animation);
+    animation.play(this.dispatcher);
+  }
+
   _startGame(game, gameLogic) {
     this.data.set('currentGame', game);
     this.currentGame = gameLogic;
@@ -163,6 +172,7 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.START_GAME]: this._actionStartGame.bind(this),
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
+      [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -212,6 +222,12 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionRestoreStatus(payload) {
     this.restoreStatus();
+  }
+
+  _actionAnimationFrame(payload) {
+    const {callback} = payload;
+    
+    callback();
   }
 
   _actionPanelPressed(payload) {

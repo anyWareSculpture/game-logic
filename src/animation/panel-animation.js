@@ -1,34 +1,37 @@
-export default class Animation {
+const SculptureActionCreator = require('../actions/sculpture-action-creator');
+
+export default class PanelAnimation {
   static STOPPED = "stopped";
   static RUNNING = "running";
 
   constructor(frames, completeCallback) {
     this.frames = frames;
     this.completeCallback = completeCallback;
+    this.sculptureActionCreator = null;
 
     this.currentFrame = -1;
-    this.state = Animation.STOPPED;
+    this.state = PanelAnimation.STOPPED;
   }
 
   /**
    * @returns {Boolean} If the animation is currently running
    */
   get isRunning() {
-    return this.state === Animation.RUNNING;
+    return this.state === PanelAnimation.RUNNING;
   }
 
   /**
    * @returns {Boolean} If the animation is currently stopped
    */
   get isStopped() {
-    return this.state === Animation.STOPPED;
+    return this.state === PanelAnimation.STOPPED;
   }
 
   /**
    * Stops the animation wherever it is
    */
   stop() {
-    this.state = Animation.STOPPED;
+    this.state = PanelAnimation.STOPPED;
   }
 
   /**
@@ -40,10 +43,12 @@ export default class Animation {
   /**
    * Goes through each frame and asynchronously plays each frame
    * The default behaviour is usually sufficient for most cases
+   * @param {Dispatcher} dispatcher - The dispatcher instance
    */
-  play() {
+  play(dispatcher) {
     this.before();
-    this.state = Animation.RUNNING;
+    this.state = PanelAnimation.RUNNING;
+    this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
     
     this.playNextFrame();
   }
@@ -65,15 +70,20 @@ export default class Animation {
     this.currentFrame++;
     
     if (this.currentFrame >= this.frames.length || this.isStopped) {
-      this.after();
+      this.executeAsAction(() => this.after());
     }
     else {
       const frame = this.frames[this.currentFrame];
       setTimeout(() => {
-        frame.run();
+        this.executeAsAction(() => frame.run());
 
         this.playNextFrame();
       }, frame.timeOffset);
     }
   }
+
+  executeAsAction(callback) {
+    this.sculptureActionCreator.sendPanelAnimationFrame(callback);
+  }
 }
+

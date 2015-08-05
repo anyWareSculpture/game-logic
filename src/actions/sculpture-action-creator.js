@@ -5,6 +5,7 @@ export default class SculptureActionCreator extends BaseActionCreator {
   static MERGE_STATE = "merge-state";
   static START_GAME = "start-game";
   static RESTORE_STATUS = "restore-status";
+  static ANIMATION_FRAME = "animation-frame";
 
   static GAME_MOLE = "mole";
   static GAME_DISK = "disk";
@@ -18,26 +19,32 @@ export default class SculptureActionCreator extends BaseActionCreator {
     this._dispatch(SculptureActionCreator.MERGE_STATE, state);
   }
 
-  sendGame(game) {
+  sendStartGame(game) {
     this._dispatch(SculptureActionCreator.START_GAME, {
       game: game
     });
   }
 
   sendStartMoleGame() {
-    this.sendGame(SculptureActionCreator.GAME_MOLE);
+    this.sendStartGame(SculptureActionCreator.GAME_MOLE);
   }
 
   sendStartDiskGame() {
-    this.sendGame(SculptureActionCreator.GAME_DISK);
+    this.sendStartGame(SculptureActionCreator.GAME_DISK);
   }
 
   sendStartSimonGame() {
-    this.sendGame(SculptureActionCreator.GAME_SIMON);
+    this.sendStartGame(SculptureActionCreator.GAME_SIMON);
   }
 
   sendRestoreStatus() {
     this._dispatch(SculptureActionCreator.RESTORE_STATUS);
+  }
+
+  sendAnimationFrame(frameCallback) {
+    this._dispatch(SculptureActionCreator.ANIMATION_FRAME, {
+      callback: frameCallback
+    });
   }
 }
 
