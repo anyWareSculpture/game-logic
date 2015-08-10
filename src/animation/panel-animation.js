@@ -83,7 +83,7 @@ export default class PanelAnimation {
   }
 
   executeAsAction(callback) {
-    this.sculptureActionCreator.sendPanelAnimationFrame(callback);
+    this.sculptureActionCreator.sendAnimationFrame(callback);
   }
 }
 
