@@ -1,5 +1,5 @@
 export default {
-  GAME_MOLE: "mole",
-  GAME_DISK: "disk",
-  GAME_SIMON: "simon"
+  MOLE: "mole",
+  DISK: "disk",
+  SIMON: "simon"
 };
