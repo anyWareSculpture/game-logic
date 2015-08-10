@@ -125,9 +125,19 @@ export default class SculptureStore extends events.EventEmitter {
     animation.play(this.dispatcher);
   }
 
-  _startGame(game, gameLogic) {
+  _startGame(game) {
+    const game_logic_classes = {
+      [SculptureStore.GAME_MOLE]: MoleGameLogic,
+      [SculptureStore.GAME_DISK]: DiskGameLogic,
+      [SculptureStore.GAME_SIMON]: SimonGameLogic
+    };
+    const GameLogic = game_logic_classes[payload.game];
+    if (!GameLogic) {
+      throw new Error(`Unrecognized game: ${game}`);
+    }
+
     this.data.set('currentGame', game);
-    this.currentGame = gameLogic;
+    this.currentGame = new GameLogic(this);
     this.currentGame.start();
   }
 
@@ -173,6 +183,7 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -184,11 +195,6 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionStartGame(payload) {
-    const game_logic_classes = {
-      [SculptureActionCreator.GAME_MOLE]: MoleGameLogic,
-      [SculptureActionCreator.GAME_DISK]: DiskGameLogic,
-      [SculptureActionCreator.GAME_SIMON]: SimonGameLogic
-    };
     const games = {
       [SculptureActionCreator.GAME_MOLE]: SculptureStore.GAME_MOLE,
       [SculptureActionCreator.GAME_DISK]: SculptureStore.GAME_DISK,
@@ -196,12 +202,11 @@ export default class SculptureStore extends events.EventEmitter {
     };
 
     const game = games[payload.game];
-    const GameLogic = game_logic_classes[payload.game];
-    if (!game || !GameLogic) {
+    if (!game) {
       throw new Error(`Unrecognized game: ${payload.game}`);
     }
 
-    this._startGame(game, new GameLogic(this));
+    this._startGame(game);
   }
 
   _actionMergeState(payload) {
@@ -228,6 +233,14 @@ export default class SculptureStore extends events.EventEmitter {
     const {callback} = payload;
     
     callback();
+  }
+
+  _actionFinishStatusAnimation(payload) {
+    if (this.isStatusSuccess) {
+      this._moveToNextGame();
+    }
+    
+    this.restoreStatus();
   }
 
   _actionPanelPressed(payload) {
@@ -286,5 +299,9 @@ export default class SculptureStore extends events.EventEmitter {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
+  }
+
+  _moveToNextGame() {
+    //TODO
   }
 }
