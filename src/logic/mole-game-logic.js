@@ -1,12 +1,12 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const MoleGameActionCreator = require('../actions/mole-game-action-creator');
 
-const TARGET_PANELS = [
+const TARGET_PANEL_GROUPS = [
   // [[stripId, panelId], ...],
   [['0', '3'], ['1', '3'], ['2', '3']],
   [['0', '4'], ['1', '5']],
   [['0', '3'], ['0', '5'], ['2', '4']]
-].map((panels) => new Set(panels));
+].map((panels) => new Set([for (panel of panels) panel.join(',')]));
 
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
@@ -51,6 +51,8 @@ export default class MoleGameLogic {
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
 
+
+
     if (stripId === targetStripId && panelId === targetPanelId && pressed) {
       this.data.set("targetIndex", targetIndex + 1);
       this._enableCurrentTarget();
@@ -63,7 +65,7 @@ export default class MoleGameLogic {
       this._disableTarget(targetIndex - 1);
     }
 
-    if (targetIndex >= TARGET_PANELS.length) {
+    if (targetIndex >= TARGET_PANEL_GROUPS.length) {
       this._winGame();
       return;
     }
@@ -94,7 +96,7 @@ export default class MoleGameLogic {
 
   _getTargetPanels(index) {
     // Make sure this gets copied so the constant never gets overwritten
-    return new Set(TARGET_PANELS[index]);
+    return new Set(TARGET_PANEL_GROUPS[index]);
   }
 
   _winGame() {
