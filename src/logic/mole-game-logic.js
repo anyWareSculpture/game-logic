@@ -1,12 +1,13 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const MoleGameActionCreator = require('../actions/mole-game-action-creator');
+const PanelGroup = require('../utils/panel-group');
 
 const TARGET_PANEL_GROUPS = [
   // [[stripId, panelId], ...],
   [['0', '3'], ['1', '3'], ['2', '3']],
   [['0', '4'], ['1', '5']],
   [['0', '3'], ['0', '5'], ['2', '4']]
-].map((panels) => new Set([for (panel of panels) panel.join(',')]));
+].map((panels) => new PanelGroup(panels));
 
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
@@ -51,19 +52,24 @@ export default class MoleGameLogic {
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
 
+    if (this._currentTarget.has(stripId, panelId)) {
+      this._currentTarget.delete(stripId, panelId);
+      this._disablePanel(stripId, panelId);
+      this._updateTarget();
+    }
+  }
 
-
-    if (stripId === targetStripId && panelId === targetPanelId && pressed) {
+  _updateTarget() {
+    if (this._currentTarget.size === 0) {
+      const targetIndex = this.data.get("targetIndex");
       this.data.set("targetIndex", targetIndex + 1);
+
       this._enableCurrentTarget();
     }
   }
 
   _enableCurrentTarget() {
     const targetIndex = this.data.get("targetIndex");
-    if (targetIndex > 0) {
-      this._disableTarget(targetIndex - 1);
-    }
 
     if (targetIndex >= TARGET_PANEL_GROUPS.length) {
       this._winGame();
@@ -82,21 +88,14 @@ export default class MoleGameLogic {
     }
   }
 
-  _disableTarget(index) {
-    const targetPanels = this._getTargetPanels(index);
-    this._disablePanels(targetPanels);
-  }
-
-  _disablePanels(panels) {
+  _disablePanel(stripId, panelId) {
     const lightArray = this.store.data.get('lights');
-    for (let [stripId, panelId] of panels) {
-      lightArray.setIntensity(stripId, panelId, PANEL_OFF_INTENSITY);
-    }
+    lightArray.setIntensity(stripId, panelId, PANEL_OFF_INTENSITY);
   }
 
   _getTargetPanels(index) {
     // Make sure this gets copied so the constant never gets overwritten
-    return new Set(TARGET_PANEL_GROUPS[index]);
+    return new PanelGroup(TARGET_PANEL_GROUPS[index]);
   }
 
   _winGame() {
