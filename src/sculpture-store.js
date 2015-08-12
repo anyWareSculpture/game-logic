@@ -75,7 +75,14 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
-   * Returns the current user's username
+   * @returns {Boolean} Returns true if no game is currently being played
+   */
+  get isPlayingNoGame() {
+    return !this.currentGame;
+  }
+
+  /**
+   * @returns {String} Returns the current user's username
    */
   get username() {
     return this.config.username;
