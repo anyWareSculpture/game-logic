@@ -1,34 +1,29 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const PanelAnimation = require('../animation/panel-animation');
-const ZeroFrame = require('../animation/zero-frame');
+const NormalizeStripFrame = require('../animation/normalize-strip-frame');
 
 const PATTERN_LEVELS = [
   // level 0 sequence
-  [
-    // sequence step = {stripId: {panelId: active}}
-    // All other panels and strips will be turned inactive
-    {'0': {'3': true}},
-    {'0': {'4': true}},
-    {'0': {'5': true}},
-  ],
+  {
+    stripId: '0',
+    panelSequence: [['3'], ['4'], ['5']]
+  },
   // level 1 sequence
-  [
-    {'1': {'3': true}},
-    {'1': {'5': true}},
-    {'1': {'4': true}},
-  ],
+  {
+    stripId: '1',
+    panelSequence: [['3'], ['5'], ['4']]
+  },
   // level 2 sequence
-  [
-    {'2': {'3': true}},
-    {'2': {'5': true}},
-    {'2': {'4': true}},
-    {'2': {'6': true}},
-  ],
+  {
+    stripId: '2',
+    panelSequence: [['3'], ['5'], ['4'], ['6']]
+  }
 ];
 
 const TARGET_PANEL_INTENSITY = 100;
-const PANEL_OFF_INTENSITY = 0;
+const AVAILABLE_PANEL_INTENSITY = 100;
 const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
+const DEFAULT_SIMON_PANEL_COLOR = "white";
 
 export default class SimonGameLogic {
   // These are automatically added to the sculpture store
@@ -71,28 +66,34 @@ export default class SimonGameLogic {
 
   _playCurrentSequence() {
     const level = this.data.get('level');
-    const currentSequence = PATTERN_LEVELS[level];
+    const {stripId, panelSequence} = PATTERN_LEVELS[level];
 
-    this._playSequence(currentSequence);
+    this._playSequence(stripId, panelSequence);
   }
 
-  _playSequence(sequence) {
-    const frames = [for (step of sequence) this._makeFrame(step)];
+  _playSequence(stripId, panelSequence) {
+    const frames = [for (panelIds of panelSequence) this._makeFrame(stripId, panelIds)];
+    frames.push(this._makeLastFrame(stripId));
     const animation = new PanelAnimation(frames, this._finishPlaySequence.bind(this));
 
     this.store.playAnimation(animation);
   }
 
-  _makeFrame(step) {
-    return new ZeroFrame(this._lights, () => {
-      for (let stripId of Object.keys(step)) {
-        const panels = step[stripId];
-        for (let panelId of Object.keys(panels)) {
-          const intensity = panels[panelId] ? TARGET_PANEL_INTENSITY : PANEL_OFF_INTENSITY;
-          this._lights.setIntensity(stripId, panelId, intensity);
-        }
+  _makeFrame(stripId, panelIds) {
+    return this._createFrame(stripId, () => {
+      for (let panelId of panelIds) {
+        this._lights.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
+        //TODO: this._lights.setColor(stripId, panelId, some user color);
       }
-    }, SEQUENCE_ANIMATION_FRAME_DELAY);
+    });
+  }
+
+  _makeLastFrame(stripId) {
+    return this._createFrame(stripId, () => {});
+  }
+
+  _createFrame(stripId, callback) {
+    return new NormalizeStripFrame(this._lights, stripId, DEFAULT_SIMON_PANEL_COLOR, AVAILABLE_PANEL_INTENSITY, callback, SEQUENCE_ANIMATION_FRAME_DELAY);
   }
 
   _finishPlaySequence() {
