@@ -1,15 +1,13 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const MoleGameActionCreator = require('../actions/mole-game-action-creator');
+const PanelGroup = require('../utils/panel-group');
 
-const TARGET_PANELS = [
-  // [stripId, panelId],
-  ['0', '3'],
-  ['1', '3'],
-  ['2', '3'],
-  ['1', '4'],
-  ['0', '5'],
-  ['2', '5']
-];
+const TARGET_PANEL_GROUPS = [
+  // [[stripId, panelId], ...],
+  [['0', '3'], ['1', '3'], ['2', '3']],
+  [['0', '4'], ['1', '5']],
+  [['0', '3'], ['0', '5'], ['2', '4']]
+].map((panels) => new PanelGroup(panels));
 
 const TARGET_PANEL_INTENSITY = 100;
 const PANEL_OFF_INTENSITY = 0;
@@ -17,13 +15,14 @@ const PANEL_OFF_INTENSITY = 0;
 export default class MoleGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    targetPanelIndex: 0,
+    targetIndex: 0
   };
 
   constructor(store) {
     this.store = store;
     
     this._complete = false;
+    this._currentTarget = null;
   }
 
   get data() {
@@ -31,8 +30,8 @@ export default class MoleGameLogic {
   }
 
   start() {
-    this.data.set("targetPanelIndex", 0);
-    this._enableCurrentTargetPanel();
+    this.data.set("targetIndex", 0);
+    this._enableCurrentTarget();
   }
 
   handleActionPayload(payload) {
@@ -53,45 +52,50 @@ export default class MoleGameLogic {
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
 
-    const targetPanelIndex = this.data.get("targetPanelIndex");
-    const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
-
-    if (stripId === targetStripId && panelId === targetPanelId && pressed) {
-      this.data.set("targetPanelIndex", targetPanelIndex + 1);
-      this._enableCurrentTargetPanel();
+    if (this._currentTarget.has(stripId, panelId)) {
+      this._currentTarget.delete(stripId, panelId);
+      this._disablePanel(stripId, panelId);
+      this._updateTarget();
     }
   }
 
-  _enableCurrentTargetPanel() {
-    const targetPanelIndex = this.data.get("targetPanelIndex");
-    if (targetPanelIndex > 0) {
-      this._disablePanelIndex(targetPanelIndex - 1);
-    }
+  _updateTarget() {
+    if (this._currentTarget.size === 0) {
+      const targetIndex = this.data.get("targetIndex");
+      this.data.set("targetIndex", targetIndex + 1);
 
-    if (targetPanelIndex >= TARGET_PANELS.length) {
+      this._enableCurrentTarget();
+    }
+  }
+
+  _enableCurrentTarget() {
+    const targetIndex = this.data.get("targetIndex");
+
+    if (targetIndex >= TARGET_PANEL_GROUPS.length) {
       this._winGame();
       return;
     }
 
-    const [targetStripId, targetPanelId] = this._getTargetPanel(targetPanelIndex);
-    this._enablePanel(targetStripId, targetPanelId);
+    const targetPanels = this._getTargetPanels(targetIndex);
+    this._currentTarget = targetPanels;
+    this._enablePanels(targetPanels);
   }
 
-  _enablePanel(stripId, panelId) {
-    this.store.data.get('lights').setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
-  }
-
-  _disablePanelIndex(index) {
-    const [stripId, panelId] = this._getTargetPanel(index);
-    this._disablePanel(stripId, panelId);
+  _enablePanels(panels) {
+    const lightArray = this.store.data.get('lights');
+    for (let [stripId, panelId] of panels) {
+      lightArray.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
+    }
   }
 
   _disablePanel(stripId, panelId) {
-    this.store.data.get('lights').setIntensity(stripId, panelId, PANEL_OFF_INTENSITY);
+    const lightArray = this.store.data.get('lights');
+    lightArray.setIntensity(stripId, panelId, PANEL_OFF_INTENSITY);
   }
 
-  _getTargetPanel(index) {
-    return TARGET_PANELS[index];
+  _getTargetPanels(index) {
+    // Make sure this gets copied so the constant never gets overwritten
+    return new PanelGroup(TARGET_PANEL_GROUPS[index]);
   }
 
   _winGame() {
@@ -100,3 +104,4 @@ export default class MoleGameLogic {
     this.store.setSuccessStatus();
   }
 }
+
