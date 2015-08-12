@@ -35,6 +35,10 @@ export default class SimonGameLogic {
     this.store = store;
   }
 
+  get config() {
+    return this.store.config;
+  }
+
   get data() {
     return this.store.data.get('simon');
   }
