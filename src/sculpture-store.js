@@ -89,6 +89,13 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
+   * 
+   */
+  get userColor() {
+    return this.config.USER_COLORS[this.config.username];
+  }
+
+  /**
    * Restores the sculpture's status back to ready
    * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */

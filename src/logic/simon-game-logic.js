@@ -35,10 +35,6 @@ export default class SimonGameLogic {
     this.store = store;
   }
 
-  get config() {
-    return this.store.config;
-  }
-
   get data() {
     return this.store.data.get('simon');
   }
@@ -87,7 +83,7 @@ export default class SimonGameLogic {
     return this._createFrame(stripId, () => {
       for (let panelId of panelIds) {
         this._lights.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
-        //TODO: this._lights.setColor(stripId, panelId, some user color);
+        this._lights.setColor(stripId, panelId, this.store.userColor);
       }
     });
   }
