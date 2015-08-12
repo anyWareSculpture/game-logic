@@ -26,6 +26,7 @@ export default class SculptureStore extends events.EventEmitter {
   constructor(dispatcher) {
     super();
 
+    this.username = "sculpture0"; //TODO: get this from a config
     this.data = new TrackedData({
       status: SculptureStore.STATUS_READY,
       panelAnimation: null,
@@ -35,7 +36,7 @@ export default class SculptureStore extends events.EventEmitter {
         '0': 10,
         '1': 10,
         '2': 10
-      }, 0, "user0"), //TODO: Proper default color based on user
+      }),
       disks: new TrackedData({
         disk0: new Disk(),
         disk1: new Disk(),
