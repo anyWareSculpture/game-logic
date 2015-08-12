@@ -1,11 +1,11 @@
+const COLORS = require('../constants/colors');
 const TrackedData = require('./tracked-data');
 
 const DEFAULT_INTENSITY = 0;
-
-const COLOR_DEFAULT = "white";
+const DEFAULT_COLOR = COLORS.WHITE;
 
 export default class LightArray extends TrackedData {
-  constructor(stripLengths, defaultIntensity=DEFAULT_INTENSITY, defaultColor=COLOR_DEFAULT) {
+  constructor(stripLengths, defaultIntensity=DEFAULT_INTENSITY, defaultColor=DEFAULT_COLOR) {
     const properties = {};
     for (let stripId of Object.keys(stripLengths)) {
       const strip = {};
