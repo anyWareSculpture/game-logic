@@ -75,6 +75,13 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
+   * @returns {Boolean} Returns true if no game is currently being played
+   */
+  get isPlayingNoGame() {
+    return !this.currentGame;
+  }
+
+  /**
    * Restores the sculpture's status back to ready
    * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */
