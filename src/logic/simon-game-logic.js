@@ -23,6 +23,7 @@ const PATTERN_LEVELS = [
 const TARGET_PANEL_INTENSITY = 100;
 const AVAILABLE_PANEL_INTENSITY = 100;
 const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
+const DELAY_BETWEEN_PLAYS = 5000;
 const DEFAULT_SIMON_PANEL_COLOR = "white";
 
 export default class SimonGameLogic {
@@ -33,6 +34,8 @@ export default class SimonGameLogic {
 
   constructor(store) {
     this.store = store;
+
+    this._receivedInput = false;
   }
 
   get data() {
@@ -83,7 +86,7 @@ export default class SimonGameLogic {
     return this._createFrame(stripId, () => {
       for (let panelId of panelIds) {
         this._lights.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
-        //TODO: this._lights.setColor(stripId, panelId, some user color);
+        this._lights.setColor(stripId, panelId, this.store.userColor);
       }
     });
   }
@@ -97,6 +100,11 @@ export default class SimonGameLogic {
   }
 
   _finishPlaySequence() {
+    setTimeout(() => {
+      if (!this._receivedInput) {
+        this._playCurrentSequence();
+      }
+    }, DELAY_BETWEEN_PLAYS);
   }
 }
 

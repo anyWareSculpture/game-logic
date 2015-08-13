@@ -23,10 +23,9 @@ export default class SculptureStore extends events.EventEmitter {
   static GAME_DISK = "disk";
   static GAME_SIMON = "simon";
 
-  constructor(dispatcher) {
+  constructor(dispatcher, config) {
     super();
 
-    this.username = "sculpture0"; //TODO: get this from a config
     this.data = new TrackedData({
       status: SculptureStore.STATUS_READY,
       panelAnimation: null,
@@ -47,6 +46,7 @@ export default class SculptureStore extends events.EventEmitter {
       simon: new TrackedData(SimonGameLogic.trackedProperties)
     });
 
+    this.config = config;
     this.currentGame = null;
     this.dispatcher = dispatcher;
     this.dispatchToken = this._registerDispatcher(this.dispatcher);
@@ -79,6 +79,20 @@ export default class SculptureStore extends events.EventEmitter {
    */
   get isPlayingNoGame() {
     return !this.currentGame;
+  }
+
+  /**
+   * @returns {String} Returns the current user's username
+   */
+  get username() {
+    return this.config.username;
+  }
+
+  /**
+   * 
+   */
+  get userColor() {
+    return this.config.USER_COLORS[this.config.username];
   }
 
   /**
