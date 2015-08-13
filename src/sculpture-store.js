@@ -1,5 +1,6 @@
 const events = require('events');
 
+const Games = require('./constants/games');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const DiskGameLogic = require('./logic/disk-game-logic');
 const SimonGameLogic = require('./logic/simon-game-logic');
@@ -11,6 +12,13 @@ const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
 
+//TODO: Refactor this into a configuration that can be passed into the store
+const GAMES_SEQUENCE = [
+  Games.MOLE,
+  Games.DISK,
+  Games.SIMON
+];
+
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
 
@@ -18,10 +26,6 @@ export default class SculptureStore extends events.EventEmitter {
   static STATUS_LOCKED = "locked";
   static STATUS_SUCCESS = "success";
   static STATUS_FAILURE = "failure";
-
-  static GAME_MOLE = "mole";
-  static GAME_DISK = "disk";
-  static GAME_SIMON = "simon";
 
   constructor(dispatcher, config) {
     super();
@@ -47,7 +51,7 @@ export default class SculptureStore extends events.EventEmitter {
     });
 
     this.config = config;
-    this.currentGame = null;
+    this.currentGameLogic = null;
     this.dispatcher = dispatcher;
     this.dispatchToken = this._registerDispatcher(this.dispatcher);
     this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
@@ -57,21 +61,21 @@ export default class SculptureStore extends events.EventEmitter {
    * @returns {Boolean} Returns whether the mole game is currently being played
    */
   get isPlayingMoleGame() {
-    return this.currentGame instanceof MoleGameLogic;
+    return this.currentGameLogic instanceof MoleGameLogic;
   }
 
   /**
    * @returns {Boolean} Returns whether the disk game is currently being played
    */
   get isPlayingDiskGame() {
-    return this.currentGame instanceof DiskGameLogic;
+    return this.currentGameLogic instanceof DiskGameLogic;
   }
 
   /**
    * @returns {Boolean} Returns whether the simon game is currently being played
    */
   get isPlayingSimonGame() {
-    return this.currentGame instanceof SimonGameLogic;
+    return this.currentGameLogic instanceof SimonGameLogic;
   }
 
   /**
@@ -147,10 +151,20 @@ export default class SculptureStore extends events.EventEmitter {
     animation.play(this.dispatcher);
   }
 
-  _startGame(game, gameLogic) {
+  _startGame(game) {
+    const game_logic_classes = {
+      [Games.MOLE]: MoleGameLogic,
+      [Games.DISK]: DiskGameLogic,
+      [Games.SIMON]: SimonGameLogic
+    };
+    const GameLogic = game_logic_classes[payload.game];
+    if (!GameLogic) {
+      throw new Error(`Unrecognized game: ${game}`);
+    }
+
     this.data.set('currentGame', game);
-    this.currentGame = gameLogic;
-    this.currentGame.start();
+    this.currentGameLogic = new GameLogic(this);
+    this.currentGameLogic.start();
   }
 
   _publishChanges() {
@@ -174,8 +188,8 @@ export default class SculptureStore extends events.EventEmitter {
 
     this._delegateAction(payload);
 
-    if (this.currentGame !== null) {
-      this.currentGame.handleActionPayload(payload);
+    if (this.currentGameLogic !== null) {
+      this.currentGameLogic.handleActionPayload(payload);
     }
 
     this._publishChanges();
@@ -195,6 +209,7 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -206,24 +221,18 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionStartGame(payload) {
-    const game_logic_classes = {
-      [SculptureActionCreator.GAME_MOLE]: MoleGameLogic,
-      [SculptureActionCreator.GAME_DISK]: DiskGameLogic,
-      [SculptureActionCreator.GAME_SIMON]: SimonGameLogic
-    };
     const games = {
-      [SculptureActionCreator.GAME_MOLE]: SculptureStore.GAME_MOLE,
-      [SculptureActionCreator.GAME_DISK]: SculptureStore.GAME_DISK,
-      [SculptureActionCreator.GAME_SIMON]: SculptureStore.GAME_SIMON
+      [SculptureActionCreator.GAME_MOLE]: Games.MOLE,
+      [SculptureActionCreator.GAME_DISK]: Games.DISK,
+      [SculptureActionCreator.GAME_SIMON]: Games.SIMON
     };
 
     const game = games[payload.game];
-    const GameLogic = game_logic_classes[payload.game];
-    if (!game || !GameLogic) {
+    if (!game) {
       throw new Error(`Unrecognized game: ${payload.game}`);
     }
 
-    this._startGame(game, new GameLogic(this));
+    this._startGame(game);
   }
 
   _actionMergeState(payload) {
@@ -250,6 +259,14 @@ export default class SculptureStore extends events.EventEmitter {
     const {callback} = payload;
     
     callback();
+  }
+
+  _actionFinishStatusAnimation(payload) {
+    if (this.isStatusSuccess) {
+      this._moveToNextGame();
+    }
+    
+    this.restoreStatus();
   }
 
   _actionPanelPressed(payload) {
@@ -308,5 +325,19 @@ export default class SculptureStore extends events.EventEmitter {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
+  }
+
+  _moveToNextGame() {
+    const nextGame = this._getNextGame();
+
+    this._startGame(nextGame);
+  }
+
+  _getNextGame() {
+    const currentGame = this.data.get("currentGame");
+    let index = GAMES_SEQUENCE.indexOf(currentGame);
+    index = (index + 1) % GAMES_SEQUENCE.length;
+
+    return GAMES_SEQUENCE[index];
   }
 }
