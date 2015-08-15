@@ -157,7 +157,7 @@ export default class SculptureStore extends events.EventEmitter {
       [Games.DISK]: DiskGameLogic,
       [Games.SIMON]: SimonGameLogic
     };
-    const GameLogic = game_logic_classes[payload.game];
+    const GameLogic = game_logic_classes[game];
     if (!GameLogic) {
       throw new Error(`Unrecognized game: ${game}`);
     }
