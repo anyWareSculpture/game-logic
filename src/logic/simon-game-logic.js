@@ -24,6 +24,7 @@ const TARGET_PANEL_INTENSITY = 100;
 const AVAILABLE_PANEL_INTENSITY = 100;
 const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
 const DELAY_BETWEEN_PLAYS = 5000;
+const INPUT_TIMEOUT = 5000;
 const DEFAULT_SIMON_PANEL_COLOR = "white";
 
 export default class SimonGameLogic {
@@ -63,13 +64,16 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    let {stripId, panelId, pressed} = payload;
-    //TODO
+    const {stripId, panelId, pressed} = payload;
+    const {stripId: targetStripId, panelSequence} = this._currentLevel();
+
+    if (!pressed && targetStripId === stripId) {
+      //TODO
+    }
   }
 
   _playCurrentSequence() {
-    const level = this.data.get('level');
-    const {stripId, panelSequence} = PATTERN_LEVELS[level];
+    const {stripId, panelSequence} = this._currentLevel();
 
     this._playSequence(stripId, panelSequence);
   }
@@ -105,6 +109,11 @@ export default class SimonGameLogic {
         this._playCurrentSequence();
       }
     }, DELAY_BETWEEN_PLAYS);
+  }
+
+  _currentLevel() {
+    const level = this.data.get('level');
+    return PATTERN_LEVELS[level];
   }
 }
 
