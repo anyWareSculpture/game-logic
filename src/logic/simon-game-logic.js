@@ -24,7 +24,7 @@ const TARGET_PANEL_INTENSITY = 100;
 const AVAILABLE_PANEL_INTENSITY = 100;
 const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
 const DELAY_BETWEEN_PLAYS = 5000;
-const INPUT_TIMEOUT = 5000;
+const INPUT_TIMEOUT = 10000;
 const DEFAULT_SIMON_PANEL_COLOR = "white";
 
 export default class SimonGameLogic {
@@ -36,6 +36,8 @@ export default class SimonGameLogic {
   constructor(store) {
     this.store = store;
 
+    this._targetSequenceIndex = 0;
+    this._targetSequence = null;
     this._receivedInput = false;
   }
 
@@ -63,17 +65,77 @@ export default class SimonGameLogic {
     }
   }
 
-  _actionPanelPressed(payload) {
-    const {stripId, panelId, pressed} = payload;
-    const {stripId: targetStripId, panelSequence} = this._currentLevel();
-
-    if (!pressed && targetStripId === stripId) {
-      //TODO
+  _actionFinishStatusAnimation(payload) {
+    if (this._complete) {
+      this.store.moveToNextGame();
+    }
+    else {
+      this._playCurrentSequence();
     }
   }
 
+  _actionPanelPressed(payload) {
+    const {stripId, panelId, pressed} = payload;
+    const {stripId: targetStripId, panelSequence} = this._currentLevelData;
+
+    const panelUp = !pressed;
+    if (!panelUp || targetStripId !== stripId) {
+      return;
+    }
+
+    if (!this._receivedInput) {
+      this._receivedInput = true;
+      this._targetSequence = new Set(panelSequence[this._targetSequenceIndex]);
+
+      this._setInputTimeout();
+    }
+
+    if (!this._targetSequence.has(panelId)) {
+      //TODO: status => error => discardInput
+      return;
+    }
+
+    this._targetSequence.delete(panelId);
+
+    if (!this._targetSequence.length) {
+      this._targetSequenceIndex += 1;
+    }
+
+    if (this._targetSequenceIndex >= panelSequence.length) {
+      this._winLevel();
+    }
+  }
+
+  _setInputTimeout() {
+    setTimeout(() => {
+      if (this._receivedInput) {
+        this._discardInput();
+        this._playCurrentSequence();
+      }
+    }, INPUT_TIMEOUT);
+  }
+
+  _discardInput() {
+    this._targetSequenceIndex = 0;
+    this._targetSequence = null;
+    this._receivedInput = false;
+  }
+
+  _winLevel() {
+    this.store.data.get('lights').deactivateAll();
+    
+    this.store.setSuccessStatus();
+
+    let level = this._level + 1;
+    if (level >= this._levels) {
+      this._complete = true;
+    }
+
+    this._level = level;
+  }
+
   _playCurrentSequence() {
-    const {stripId, panelSequence} = this._currentLevel();
+    const {stripId, panelSequence} = this._currentLevelData;
 
     this._playSequence(stripId, panelSequence);
   }
@@ -111,9 +173,21 @@ export default class SimonGameLogic {
     }, DELAY_BETWEEN_PLAYS);
   }
 
-  _currentLevel() {
-    const level = this.data.get('level');
+  get _levels() {
+    return PATTERN_LEVELS.length;
+  }
+
+  get _currentLevelData() {
+    const level = this._level;
     return PATTERN_LEVELS[level];
+  }
+
+  get _level() {
+    return this.data.get('level');
+  }
+
+  set _level(value) {
+    return this.data.set('level', value);
   }
 }
 
