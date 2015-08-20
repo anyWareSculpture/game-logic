@@ -196,8 +196,7 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionCanRunWhenLocked(actionType) {
     const enabledActions = new Set([
-      SculptureActionCreator.MERGE_STATE,
-      MoleGameActionCreator.ANIMATION_FINISH
+      SculptureActionCreator.MERGE_STATE
     ]);
     return enabledActions.has(actionType);
   }
