@@ -1,5 +1,4 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
-const MoleGameActionCreator = require('../actions/mole-game-action-creator');
 const PanelGroup = require('../utils/panel-group');
 
 const TARGET_PANEL_GROUPS = [

@@ -7,7 +7,6 @@ const SimonGameLogic = require('./logic/simon-game-logic');
 const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const DisksActionCreator = require('./actions/disks-action-creator');
-const MoleGameActionCreator = require('./actions/mole-game-action-creator');
 const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
