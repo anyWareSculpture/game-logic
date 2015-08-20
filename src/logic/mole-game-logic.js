@@ -1,4 +1,5 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const SculptureActionCreator = require('../actions/sculpture-action-creator');
 const PanelGroup = require('../utils/panel-group');
 
 const TARGET_PANEL_GROUPS = [
@@ -40,6 +41,7 @@ export default class MoleGameLogic {
 
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -56,6 +58,11 @@ export default class MoleGameLogic {
       this._disablePanel(stripId, panelId);
       this._updateTarget();
     }
+  }
+
+  _actionFinishStatusAnimation(payload) {
+    this._complete = true;
+    this.store.moveToNextGame();
   }
 
   _updateTarget() {
@@ -98,7 +105,6 @@ export default class MoleGameLogic {
   }
 
   _winGame() {
-    this._complete = true;
     this.store.data.get('lights').deactivateAll();
     this.store.setSuccessStatus();
   }

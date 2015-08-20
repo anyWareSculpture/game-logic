@@ -150,6 +150,15 @@ export default class SculptureStore extends events.EventEmitter {
     animation.play(this.dispatcher);
   }
 
+  /**
+   * Starts the next game in the game sequence
+   */
+  moveToNextGame() {
+    const nextGame = this._getNextGame();
+
+    this._startGame(nextGame);
+  }
+
   _startGame(game) {
     const game_logic_classes = {
       [Games.MOLE]: MoleGameLogic,
@@ -260,10 +269,6 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionFinishStatusAnimation(payload) {
-    if (this.isStatusSuccess) {
-      this._moveToNextGame();
-    }
-    
     this.restoreStatus();
   }
 
@@ -323,12 +328,6 @@ export default class SculptureStore extends events.EventEmitter {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
-  }
-
-  _moveToNextGame() {
-    const nextGame = this._getNextGame();
-
-    this._startGame(nextGame);
   }
 
   _getNextGame() {

@@ -1,5 +1,6 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const DisksActionCreator = require('../actions/disks-action-creator');
+const SculptureActionCreator = require('../actions/sculpture-action-creator');
 
 const Disk = require('../utils/disk');
 
@@ -63,6 +64,8 @@ export default class DiskGameLogic {
 
   constructor(store) {
     this.store = store;
+
+    this._complete = false;
   }
 
   get data() {
@@ -70,13 +73,14 @@ export default class DiskGameLogic {
   }
 
   start() {
-    this.data.set('level', DEFAULT_LEVEL);
+    this._level = DEFAULT_LEVEL;
   }
 
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
+      [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this),
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -88,7 +92,7 @@ export default class DiskGameLogic {
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
 
-    if (!CONTROL_MAPPINGS.hasOwnProperty(stripId) || !CONTROL_MAPPINGS[stripId].hasOwnProperty(panelId)) {
+    if (this._complete || !CONTROL_MAPPINGS.hasOwnProperty(stripId) || !CONTROL_MAPPINGS[stripId].hasOwnProperty(panelId)) {
       return;
     }
 
@@ -128,6 +132,12 @@ export default class DiskGameLogic {
     }
   }
 
+  _actionFinishStatusAnimation(payload) {
+    if (this._complete) {
+      this.store.moveToNextGame();
+    }
+  }
+
   _checkWinConditions(disks) {
     for (let diskId of Object.keys(this._targetPositions)) {
       const targetPosition = this._targetPositions[diskId];
@@ -145,13 +155,12 @@ export default class DiskGameLogic {
 
     this.store.setSuccessStatus();
 
-    let level = this.data.get('level') + 1;
+    let level = this._level + 1;
     if (level >= this._levels) {
-      //TODO: Move on to the next game
-      level = 0;
+      this._complete = true;
     }
 
-    this.data.set('level', level);
+    this._level = level;
   }
 
   _stopAllDisks() {
@@ -163,11 +172,19 @@ export default class DiskGameLogic {
   }
 
   get _targetPositions() {
-    const level = this.data.get("level");
+    const level = this._level;
     return TARGET_POSITIONS_LEVELS[level];
   }
 
   get _levels() {
     return TARGET_POSITIONS_LEVELS.length;
+  }
+
+  get _level() {
+    return this.data.get('level');
+  }
+
+  set _level(value) {
+    return this.data.set('level', value);
   }
 }
