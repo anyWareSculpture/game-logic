@@ -137,6 +137,13 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
+   * Returns whether the sculpture's current status is ready
+   */
+  get isReady() {
+    return this.data.get('status') === SculptureStore.STATUS_READY;
+  }
+
+  /**
    * Returns whether the sculpture's current status is locked
    */
   get isLocked() {
@@ -281,6 +288,10 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionPanelPressed(payload) {
+    if (!this.isReady) {
+      return;
+    }
+
     const {stripId, panelId, pressed} = payload;
     this.data.get('lights').activate(stripId, panelId, pressed);
   }

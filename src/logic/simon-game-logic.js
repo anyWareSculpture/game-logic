@@ -87,7 +87,7 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    if (this._complete || this.store.isPanelAnimationRunning) {
+    if (this._complete || !this.isReadyAndNotAnimating) {
       return;
     }
 
@@ -107,7 +107,7 @@ export default class SimonGameLogic {
     }
 
     if (!this._targetSequence.has(panelId)) {
-      //TODO: status => error => discardInput
+      this.store.setFailureStatus();
       return;
     }
 
@@ -128,7 +128,7 @@ export default class SimonGameLogic {
   _setInputTimeout() {
     const level = this._level;
     setTimeout(() => {
-      if (this._receivedInput && this._level === level) {
+      if (this.isReadyAndNotAnimating && this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
     }, INPUT_TIMEOUT);
@@ -190,7 +190,7 @@ export default class SimonGameLogic {
   _finishPlaySequence() {
     const level = this._level;
     setTimeout(() => {
-      if (!this._receivedInput && this._level === level) {
+      if (this.isReadyAndNotAnimating && !this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
     }, DELAY_BETWEEN_PLAYS);
@@ -211,6 +211,10 @@ export default class SimonGameLogic {
 
   set _level(value) {
     return this.data.set('level', value);
+  }
+
+  get isReadyAndNotAnimating() {
+    return this.store.isReady && !this.store.isPanelAnimationRunning
   }
 }
 
