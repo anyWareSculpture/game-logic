@@ -1,6 +1,6 @@
 const events = require('events');
 
-const Games = require('./constants/games');
+const GAMES = require('./constants/games');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const DiskGameLogic = require('./logic/disk-game-logic');
 const SimonGameLogic = require('./logic/simon-game-logic');
@@ -10,13 +10,6 @@ const DisksActionCreator = require('./actions/disks-action-creator');
 const TrackedData = require('./utils/tracked-data');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
-
-//TODO: Refactor this into a configuration that can be passed into the store
-const GAMES_SEQUENCE = [
-  Games.MOLE,
-  Games.DISK,
-  Games.SIMON
-];
 
 export default class SculptureStore extends events.EventEmitter {
   static EVENT_CHANGE = "change";
@@ -176,9 +169,9 @@ export default class SculptureStore extends events.EventEmitter {
 
   _startGame(game) {
     const game_logic_classes = {
-      [Games.MOLE]: MoleGameLogic,
-      [Games.DISK]: DiskGameLogic,
-      [Games.SIMON]: SimonGameLogic
+      [GAMES.MOLE]: MoleGameLogic,
+      [GAMES.DISK]: DiskGameLogic,
+      [GAMES.SIMON]: SimonGameLogic
     };
     const GameLogic = game_logic_classes[game];
     if (!GameLogic) {
@@ -244,9 +237,9 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionStartGame(payload) {
     const games = {
-      [SculptureActionCreator.GAME_MOLE]: Games.MOLE,
-      [SculptureActionCreator.GAME_DISK]: Games.DISK,
-      [SculptureActionCreator.GAME_SIMON]: Games.SIMON
+      [SculptureActionCreator.GAME_MOLE]: GAMES.MOLE,
+      [SculptureActionCreator.GAME_DISK]: GAMES.DISK,
+      [SculptureActionCreator.GAME_SIMON]: GAMES.SIMON
     };
 
     const game = games[payload.game];
@@ -323,16 +316,18 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _mergeLights(lightChanges) {
+    const lightArray = this.data.get('lights');
+
     for (let stripId of Object.keys(lightChanges)) {
       const panels = lightChanges[stripId].panels;
       for (let panelId of Object.keys(panels)) {
         const panelChanges = panels[panelId];
         if (panelChanges.hasOwnProperty("intensity")) {
-          this.data.get('lights').setIntensity(stripId, panelId, panelChanges.intensity);
+          lightArray.setIntensity(stripId, panelId, panelChanges.intensity);
         }
         if (panelChanges.hasOwnProperty("active")) {
           //TODO: Set color based on metadata
-          this.data.get('lights').activate(stripId, panelId, panelChanges.active);
+          lightArray.activate(stripId, panelId, panelChanges.active);
         }
       }
     }
@@ -351,9 +346,9 @@ export default class SculptureStore extends events.EventEmitter {
 
   _getNextGame() {
     const currentGame = this.data.get("currentGame");
-    let index = GAMES_SEQUENCE.indexOf(currentGame);
-    index = (index + 1) % GAMES_SEQUENCE.length;
+    let index = this.config.GAMES_SEQUENCE.indexOf(currentGame);
+    index = (index + 1) % this.config.GAMES_SEQUENCE.length;
 
-    return GAMES_SEQUENCE[index];
+    return this.config.GAMES_SEQUENCE[index];
   }
 }

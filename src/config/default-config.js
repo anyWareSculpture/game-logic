@@ -12,6 +12,7 @@
  */
 
 const COLORS = require('../constants/colors');
+const GAMES = require('../constants/games');
 
 const config = {};
 export default config;
@@ -26,4 +27,10 @@ config.USER_COLORS = {
   sculpture1: COLORS.USER1,
   sculpture2: COLORS.USER2
 };
+
+config.GAMES_SEQUENCE = [
+  GAMES.MOLE,
+  GAMES.DISK,
+  GAMES.SIMON
+];
 
