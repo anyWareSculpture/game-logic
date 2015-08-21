@@ -1,4 +1,5 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
+const SculptureActionCreator = require('../actions/sculpture-action-creator');
 const PanelAnimation = require('../animation/panel-animation');
 const NormalizeStripFrame = require('../animation/normalize-strip-frame');
 
@@ -57,6 +58,7 @@ export default class SimonGameLogic {
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
@@ -75,6 +77,10 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
+    if (this._complete) {
+      return;
+    }
+
     const {stripId, panelId, pressed} = payload;
     const {stripId: targetStripId, panelSequence} = this._currentLevelData;
 
@@ -99,6 +105,7 @@ export default class SimonGameLogic {
 
     if (!this._targetSequence.length) {
       this._targetSequenceIndex += 1;
+      this._targetSequence = new Set(panelSequence[this._targetSequenceIndex]);
     }
 
     if (this._targetSequenceIndex >= panelSequence.length) {
@@ -108,8 +115,7 @@ export default class SimonGameLogic {
 
   _setInputTimeout() {
     setTimeout(() => {
-      if (this._receivedInput) {
-        this._discardInput();
+      if (!this._complete && this._receivedInput) {
         this._playCurrentSequence();
       }
     }, INPUT_TIMEOUT);
@@ -123,6 +129,7 @@ export default class SimonGameLogic {
 
   _winLevel() {
     this.store.data.get('lights').deactivateAll();
+    this._lights.setIntensity(this._currentLevelData.stripId, null, 0);
     
     this.store.setSuccessStatus();
 
@@ -141,6 +148,8 @@ export default class SimonGameLogic {
   }
 
   _playSequence(stripId, panelSequence) {
+    this._discardInput();
+
     const frames = [for (panelIds of panelSequence) this._makeFrame(stripId, panelIds)];
     frames.push(this._makeLastFrame(stripId));
     const animation = new PanelAnimation(frames, this._finishPlaySequence.bind(this));
@@ -167,7 +176,7 @@ export default class SimonGameLogic {
 
   _finishPlaySequence() {
     setTimeout(() => {
-      if (!this._receivedInput) {
+      if (!this._complete && !this._receivedInput) {
         this._playCurrentSequence();
       }
     }, DELAY_BETWEEN_PLAYS);
