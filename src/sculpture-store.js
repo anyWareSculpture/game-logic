@@ -99,6 +99,14 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
+   * @returns {Boolean} Returns whether a panel animation is running
+   */
+  get isPanelAnimationRunning() {
+    const panelAnimation = this.data.get('panelAnimation');
+    return panelAnimation ? panelAnimation.isRunning : false;
+  }
+
+  /**
    * Restores the sculpture's status back to ready
    * Make sure to publish changes after calling this -- not necessary if an action is currently being handled already
    */

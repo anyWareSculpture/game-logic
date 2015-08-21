@@ -1,5 +1,6 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const SculptureActionCreator = require('../actions/sculpture-action-creator');
+const SimonGameActionCreator = require('../actions/simon-game-action-creator');
 const PanelAnimation = require('../animation/panel-animation');
 const NormalizeStripFrame = require('../animation/normalize-strip-frame');
 
@@ -37,6 +38,8 @@ export default class SimonGameLogic {
   constructor(store) {
     this.store = store;
 
+    this.simonGameActionCreator = new SimonGameActionCreator(this.store.dispatcher);
+
     this._targetSequenceIndex = 0;
     this._targetSequence = null;
     this._receivedInput = false;
@@ -58,12 +61,19 @@ export default class SimonGameLogic {
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
+      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this),
+      [SimonGameActionCreator.REPLAY_SIMON_PATTERN]: this._actionReplaySimonPattern.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
     if (actionHandler) {
       actionHandler(payload);
+    }
+  }
+
+  _actionReplaySimonPattern(payload) {
+    if (!this._complete) {
+      this._playCurrentSequence();
     }
   }
 
@@ -77,7 +87,7 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    if (this._complete) {
+    if (this._complete || this.store.isPanelAnimationRunning) {
       return;
     }
 
@@ -105,18 +115,21 @@ export default class SimonGameLogic {
 
     if (!this._targetSequence.length) {
       this._targetSequenceIndex += 1;
-      this._targetSequence = new Set(panelSequence[this._targetSequenceIndex]);
     }
 
     if (this._targetSequenceIndex >= panelSequence.length) {
       this._winLevel();
     }
+    else {
+      this._targetSequence = new Set(panelSequence[this._targetSequenceIndex]);
+    }
   }
 
   _setInputTimeout() {
+    const level = this._level;
     setTimeout(() => {
-      if (!this._complete && this._receivedInput) {
-        this._playCurrentSequence();
+      if (this._receivedInput && this._level === level) {
+        this.simonGameActionCreator.sendReplaySimonPattern();
       }
     }, INPUT_TIMEOUT);
   }
@@ -175,9 +188,10 @@ export default class SimonGameLogic {
   }
 
   _finishPlaySequence() {
+    const level = this._level;
     setTimeout(() => {
-      if (!this._complete && !this._receivedInput) {
-        this._playCurrentSequence();
+      if (!this._receivedInput && this._level === level) {
+        this.simonGameActionCreator.sendReplaySimonPattern();
       }
     }, DELAY_BETWEEN_PLAYS);
   }
