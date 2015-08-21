@@ -43,6 +43,9 @@ export default class SimonGameLogic {
     this._targetSequenceIndex = 0;
     this._targetSequence = null;
     this._receivedInput = false;
+
+    this._inputTimeout = null;
+    this._replayTimeout = null;
   }
 
   get data() {
@@ -126,8 +129,10 @@ export default class SimonGameLogic {
   }
 
   _setInputTimeout() {
+    clearTimeout(this._inputTimeout);
+
     const level = this._level;
-    setTimeout(() => {
+    this._inputTimeout = setTimeout(() => {
       if (this.isReadyAndNotAnimating && this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
@@ -188,8 +193,10 @@ export default class SimonGameLogic {
   }
 
   _finishPlaySequence() {
+    clearTimeout(this._replayTimeout);
+
     const level = this._level;
-    setTimeout(() => {
+    this._replayTimeout = setTimeout(() => {
       if (this.isReadyAndNotAnimating && !this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
@@ -214,7 +221,7 @@ export default class SimonGameLogic {
   }
 
   get isReadyAndNotAnimating() {
-    return this.store.isReady && !this.store.isPanelAnimationRunning
+    return this.store.isReady && !this.store.isPanelAnimationRunning;
   }
 }
 
