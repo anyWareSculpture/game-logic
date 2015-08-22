@@ -236,13 +236,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionStartGame(payload) {
-    const games = {
-      [SculptureActionCreator.GAME_MOLE]: GAMES.MOLE,
-      [SculptureActionCreator.GAME_DISK]: GAMES.DISK,
-      [SculptureActionCreator.GAME_SIMON]: GAMES.SIMON
-    };
-
-    const game = games[payload.game];
+    const game = payload.game;
     if (!game) {
       throw new Error(`Unrecognized game: ${payload.game}`);
     }

@@ -1,5 +1,7 @@
 const BaseActionCreator = require('./base-action-creator');
 
+const GAMES = require('../constants/games');
+
 export default class SculptureActionCreator extends BaseActionCreator {
   // Action types
   static MERGE_STATE = "merge-state";
@@ -7,10 +9,6 @@ export default class SculptureActionCreator extends BaseActionCreator {
   static RESTORE_STATUS = "restore-status";
   static ANIMATION_FRAME = "animation-frame";
   static FINISH_STATUS_ANIMATION = "finish-status-animation";
-
-  static GAME_MOLE = "mole";
-  static GAME_DISK = "disk";
-  static GAME_SIMON = "simon";
 
   /**
    * Sends an action asking the sculpture to merge some state
@@ -27,15 +25,15 @@ export default class SculptureActionCreator extends BaseActionCreator {
   }
 
   sendStartMoleGame() {
-    this.sendStartGame(SculptureActionCreator.GAME_MOLE);
+    this.sendStartGame(GAMES.MOLE);
   }
 
   sendStartDiskGame() {
-    this.sendStartGame(SculptureActionCreator.GAME_DISK);
+    this.sendStartGame(GAMES.DISK);
   }
 
   sendStartSimonGame() {
-    this.sendStartGame(SculptureActionCreator.GAME_SIMON);
+    this.sendStartGame(GAMES.SIMON);
   }
 
   sendRestoreStatus() {
