@@ -244,22 +244,6 @@ export default class SculptureStore extends events.EventEmitter {
     this._startGame(game);
   }
 
-  _actionMergeState(payload) {
-    const mergeFunctions = {
-      status: this._mergeStatus.bind(this),
-      lights: this._mergeLights.bind(this),
-      disks: this._mergeDisks.bind(this),
-      mole: this._mergeMole.bind(this)
-    };
-
-    for (let propName of Object.keys(payload)) {
-      const mergeFunction = mergeFunctions[propName];
-      if (mergeFunction) {
-        mergeFunction(payload[propName]);
-      }
-    }
-  }
-
   _actionRestoreStatus(payload) {
     this.restoreStatus();
   }
@@ -305,11 +289,39 @@ export default class SculptureStore extends events.EventEmitter {
     }
   }
 
-  _mergeStatus(newStatus) {
+  _actionMergeState(payload) {
+    const metadata = payload.metadata;
+    if (metadata.from === this.username) {
+      return;
+    }
+
+    const mergeFunctions = {
+      status: this._mergeStatus.bind(this),
+      currentGame: this._mergeCurrentGame.bind(this),
+      lights: this._mergeLights.bind(this),
+      disks: this._mergeDisks.bind(this),
+      mole: this._mergeMole.bind(this),
+      disk: this._mergeDisk.bind(this),
+      simon: this._mergeSimon.bind(this),
+    };
+
+    for (let propName of Object.keys(payload)) {
+      const mergeFunction = mergeFunctions[propName];
+      if (mergeFunction) {
+        mergeFunction(payload[propName], metadata);
+      }
+    }
+  }
+
+  _mergeStatus(newStatus, metadata) {
     this.data.set('status', newStatus);
   }
 
-  _mergeLights(lightChanges) {
+  _mergeCurrentGame(newCurrentGame, metadata) {
+    this._startGame(newCurrentGame);
+  }
+
+  _mergeLights(lightChanges, metadata) {
     const lightArray = this.data.get('lights');
 
     for (let stripId of Object.keys(lightChanges)) {
@@ -319,23 +331,35 @@ export default class SculptureStore extends events.EventEmitter {
         if (panelChanges.hasOwnProperty("intensity")) {
           lightArray.setIntensity(stripId, panelId, panelChanges.intensity);
         }
+        if (panelChanges.hasOwnProperty("color")) {
+          lightArray.setColor(stripId, panelId, panelChanges.color);
+        }
         if (panelChanges.hasOwnProperty("active")) {
-          //TODO: Set color based on metadata
           lightArray.activate(stripId, panelId, panelChanges.active);
+          const color = this.config.USER_COLORS[metadata.from];
+          lightArray.setColor(stripId, panelId, color);
         }
       }
     }
   }
 
-  _mergeDisks(diskChanges) {
+  _mergeDisks(disksChanges, metadata) {
     //TODO
-    console.log(diskChanges);
+    console.log(disksChanges);
   }
 
-  _mergeMole(moleChanges) {
+  _mergeMole(moleChanges, metadata) {
     for (let propName of Object.keys(moleChanges)) {
       this.data.get('mole').set(propName, moleChanges[propName]);
     }
+  }
+
+  _mergeDisk(diskChanges, metadata) {
+    //TODO
+  }
+
+  _mergeSimon(simonChanges, metadata) {
+    //TODO
   }
 
   _getNextGame() {
@@ -346,3 +370,4 @@ export default class SculptureStore extends events.EventEmitter {
     return this.config.GAMES_SEQUENCE[index];
   }
 }
+
