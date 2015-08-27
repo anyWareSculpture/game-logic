@@ -183,21 +183,14 @@ export default class SculptureStore extends events.EventEmitter {
     this.currentGameLogic.start();
   }
 
-  _publishChanges() {
-    const changes = this.data.getChangedCurrentValues();
-
-    if (Object.keys(changes).length) {
-      this.emit(SculptureStore.EVENT_CHANGE, changes);
-    }
-
-    this.data.clearChanges();
-  }
-
   _registerDispatcher(dispatcher) {
     return dispatcher.register(this._handleActionPayload.bind(this));
   }
 
   _handleActionPayload(payload) {
+    // Protects against accidentally modifying the store outside of an action
+    this._assertNoChanges();
+
     if (this.isLocked && !this._actionCanRunWhenLocked(payload.actionType)) {
       return;
     }
@@ -209,6 +202,22 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     this._publishChanges();
+  }
+
+  _assertNoChanges() {
+    if (this.data.hasChanges()) {
+      throw new Error("Store was changed outside of an action");
+    }
+  }
+
+  _publishChanges() {
+    const changes = this.data.getChangedCurrentValues();
+
+    if (Object.keys(changes).length) {
+      this.emit(SculptureStore.EVENT_CHANGE, changes);
+    }
+
+    this.data.clearChanges();
   }
 
   _actionCanRunWhenLocked(actionType) {
