@@ -9,6 +9,7 @@ export const DiskGameLogic = require('./logic/disk-game-logic');
 export const SimonGameLogic = require('./logic/simon-game-logic');
 
 export const Disk = require('./utils/disk');
+export const LightArray = require('./utils/light-array');
 
 export const DefaultConfig = require('./config/default-config');
 
