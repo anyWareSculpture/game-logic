@@ -41,6 +41,7 @@ export default class MoleGameLogic {
 
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
@@ -51,8 +52,28 @@ export default class MoleGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    let {stripId, panelId, pressed} = payload;
+    const {stripId, panelId, pressed} = payload;
+    this._handlePanelActive(stripId, panelId, pressed);
+  }
 
+  _actionMergeState(payload) {
+    const lightChanges = payload.lights;
+    if (!lightChanges) {
+      return;
+    }
+
+    for (let stripId of Object.keys(lightChanges)) {
+      const panels = lightChanges[stripId].panels;
+      for (let panelId of Object.keys(panels)) {
+        const panelChanges = panels[panelId];
+        if (panelChanges.hasOwnProperty("active")) {
+          this._handlePanelActive(stripId, panelId, panelChanges.active);
+        }
+      }
+    }
+  }
+
+  _handlePanelActive(stripId, panelId, pressed) {
     if (this._currentTarget.has(stripId, panelId)) {
       this._currentTarget.delete(stripId, panelId);
       this._disablePanel(stripId, panelId);
