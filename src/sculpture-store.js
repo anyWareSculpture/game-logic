@@ -245,6 +245,10 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionMergeState(payload) {
+    if (payload.metadata.from === this.username) {
+      return;
+    }
+
     const mergeFunctions = {
       status: this._mergeStatus.bind(this),
       lights: this._mergeLights.bind(this),
