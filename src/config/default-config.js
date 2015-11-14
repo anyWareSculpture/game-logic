@@ -1,5 +1,5 @@
 /**
- * Default thisuration
+ * Default Configuration
  * 
  * Extend the class exported from this module to create your own local
  * configuration objects or use this directly.
