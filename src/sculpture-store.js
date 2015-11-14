@@ -179,7 +179,7 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     this.data.set('currentGame', game);
-    this.currentGameLogic = new GameLogic(this);
+    this.currentGameLogic = new GameLogic(this, this.config);
     this.currentGameLogic.start();
   }
 

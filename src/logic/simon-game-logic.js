@@ -4,39 +4,18 @@ const SimonGameActionCreator = require('../actions/simon-game-action-creator');
 const PanelAnimation = require('../animation/panel-animation');
 const NormalizeStripFrame = require('../animation/normalize-strip-frame');
 
-const PATTERN_LEVELS = [
-  // level 0 sequence
-  {
-    stripId: '0',
-    panelSequence: [['3'], ['4'], ['5']]
-  },
-  // level 1 sequence
-  {
-    stripId: '1',
-    panelSequence: [['3'], ['5'], ['4']]
-  },
-  // level 2 sequence
-  {
-    stripId: '2',
-    panelSequence: [['3'], ['5'], ['4'], ['6']]
-  }
-];
-
-const TARGET_PANEL_INTENSITY = 100;
-const AVAILABLE_PANEL_INTENSITY = 20;
-const SEQUENCE_ANIMATION_FRAME_DELAY = 500;
-const DELAY_BETWEEN_PLAYS = 5000;
-const INPUT_TIMEOUT = 10000;
-const DEFAULT_SIMON_PANEL_COLOR = "white";
+const DEFAULT_LEVEL = 0;
 
 export default class SimonGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    level: 0
+    level: DEFAULT_LEVEL
   };
 
-  constructor(store) {
+  constructor(store, config) {
     this.store = store;
+    this.config = config;
+    this.gameConfig = this.config.SIMON_GAME;
 
     this.simonGameActionCreator = new SimonGameActionCreator(this.store.dispatcher);
 
@@ -57,7 +36,7 @@ export default class SimonGameLogic {
   }
 
   start() {
-    this.data.set('level', 0);
+    this.data.set('level', DEFAULT_LEVEL);
     this._playCurrentSequence();
   }
 
@@ -136,7 +115,7 @@ export default class SimonGameLogic {
       if (this.isReadyAndNotAnimating && this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
-    }, INPUT_TIMEOUT);
+    }, this.gameConfig.INPUT_TIMEOUT);
   }
 
   _discardInput() {
@@ -168,28 +147,32 @@ export default class SimonGameLogic {
   _playSequence(stripId, panelSequence) {
     this._discardInput();
 
-    const frames = [for (panelIds of panelSequence) this._makeFrame(stripId, panelIds)];
-    frames.push(this._makeLastFrame(stripId));
+    const frames = panelSequence.map((panelIds) => this._createSequenceFrame(stripId, panelIds));
+    frames.push(this._createLastSequenceFrame(stripId));
     const animation = new PanelAnimation(frames, this._finishPlaySequence.bind(this));
 
     this.store.playAnimation(animation);
   }
 
-  _makeFrame(stripId, panelIds) {
+  _createSequenceFrame(stripId, panelIds) {
     return this._createFrame(stripId, () => {
       for (let panelId of panelIds) {
-        this._lights.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
+        this._lights.setIntensity(stripId, panelId, this.gameConfig.TARGET_PANEL_INTENSITY);
         this._lights.setColor(stripId, panelId, this.store.userColor);
       }
     });
   }
 
-  _makeLastFrame(stripId) {
+  _createLastSequenceFrame(stripId) {
     return this._createFrame(stripId, () => {});
   }
 
   _createFrame(stripId, callback) {
-    return new NormalizeStripFrame(this._lights, stripId, DEFAULT_SIMON_PANEL_COLOR, AVAILABLE_PANEL_INTENSITY, callback, SEQUENCE_ANIMATION_FRAME_DELAY);
+    return new NormalizeStripFrame(this._lights, stripId,
+      this.gameConfig.DEFAULT_SIMON_PANEL_COLOR,
+      this.gameConfig.AVAILABLE_PANEL_INTENSITY,
+      callback,
+      this.gameConfig.SEQUENCE_ANIMATION_FRAME_DELAY);
   }
 
   _finishPlaySequence() {
@@ -200,16 +183,16 @@ export default class SimonGameLogic {
       if (this.isReadyAndNotAnimating && !this._receivedInput && this._level === level) {
         this.simonGameActionCreator.sendReplaySimonPattern();
       }
-    }, DELAY_BETWEEN_PLAYS);
+    }, this.gameConfig.DELAY_BETWEEN_PLAYS);
   }
 
   get _levels() {
-    return PATTERN_LEVELS.length;
+    return this.gameConfig.PATTERN_LEVELS.length;
   }
 
   get _currentLevelData() {
     const level = this._level;
-    return PATTERN_LEVELS[level];
+    return this.gameConfig.PATTERN_LEVELS[level];
   }
 
   get _level() {
