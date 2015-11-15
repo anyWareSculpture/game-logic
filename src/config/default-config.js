@@ -23,7 +23,7 @@ export default class DefaultConfig {
       user0="sculpture0",
       user1="sculpture1",
       user2="sculpture2"
-  }) {
+  } = {}) {
     this.user0 = user0;
     this.user1 = user1;
     this.user2 = user2;
