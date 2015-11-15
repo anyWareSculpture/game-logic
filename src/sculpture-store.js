@@ -1,6 +1,7 @@
 const events = require('events');
 
 const GAMES = require('./constants/games');
+const HandshakeGameLogic = require('./logic/mole-game-logic');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const DiskGameLogic = require('./logic/disk-game-logic');
 const SimonGameLogic = require('./logic/simon-game-logic');
@@ -37,6 +38,7 @@ export default class SculptureStore extends events.EventEmitter {
         disk1: new Disk(),
         disk2: new Disk()
       }),
+      handshake: new TrackedData(HandshakeGameLogic.trackedProperties),
       mole: new TrackedData(MoleGameLogic.trackedProperties),
       disk: new TrackedData(DiskGameLogic.trackedProperties),
       simon: new TrackedData(SimonGameLogic.trackedProperties)
@@ -169,6 +171,7 @@ export default class SculptureStore extends events.EventEmitter {
 
   _startGame(game) {
     const game_logic_classes = {
+      [GAMES.HANDSHAKE]: HandshakeGameLogic,
       [GAMES.MOLE]: MoleGameLogic,
       [GAMES.DISK]: DiskGameLogic,
       [GAMES.SIMON]: SimonGameLogic
