@@ -151,5 +151,9 @@ export default class DefaultConfig {
       DEFAULT_SIMON_PANEL_COLOR: "white"
     };
   }
+
+  getUserColor(username) {
+    return this.USER_COLORS[username];
+  }
 }
 

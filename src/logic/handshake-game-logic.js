@@ -1,3 +1,5 @@
+const SculptureActionCreator = require('../actions/sculpture-action-creator');
+
 export default class HandshakeGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
@@ -23,13 +25,18 @@ export default class HandshakeGameLogic {
     }
 
     const actionHandlers = {
-      [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
+      [SculptureActionCreator.HANDSHAKE_ACTIVATE]: this._actionHandshakeActivate.bind(this)
     };
 
     const actionHandler = actionHandlers[payload.actionType];
     if (actionHandler) {
       actionHandler(payload);
+    }
+  }
+
+  _actionHandshakeActivate(payload) {
+    if (payload.user === this.store.username) {
+      this._winGame();
     }
   }
 

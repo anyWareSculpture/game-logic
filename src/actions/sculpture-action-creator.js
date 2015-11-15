@@ -9,6 +9,8 @@ export default class SculptureActionCreator extends BaseActionCreator {
   static RESTORE_STATUS = "restore-status";
   static ANIMATION_FRAME = "animation-frame";
   static FINISH_STATUS_ANIMATION = "finish-status-animation";
+  static HANDSHAKE_ACTIVATE = "handshake-activate";
+  static HANDSHAKE_DEACTIVATE = "handshake-deactivate";
 
   /**
    * Sends an action asking the sculpture to merge some state
@@ -48,6 +50,18 @@ export default class SculptureActionCreator extends BaseActionCreator {
 
   sendFinishStatusAnimation() {
     this._dispatch(SculptureActionCreator.FINISH_STATUS_ANIMATION);
+  }
+
+  sendHandshakeActivate(user) {
+    this._dispatch(SculptureActionCreator.HANDSHAKE_ACTIVATE, {
+      user: user
+    });
+  }
+
+  sendHandshakeDeactivate(user) {
+    this._dispatch(SculptureActionCreator.HANDSHAKE_DEACTIVATE, {
+      user: user
+    });
   }
 }
 

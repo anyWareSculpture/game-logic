@@ -9,6 +9,7 @@ const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const DisksActionCreator = require('./actions/disks-action-creator');
 const TrackedData = require('./utils/tracked-data');
+const TrackedSet = require('./utils/tracked-set');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
 
@@ -27,6 +28,7 @@ export default class SculptureStore extends events.EventEmitter {
       status: SculptureStore.STATUS_READY,
       panelAnimation: null,
       currentGame: null,
+      handshakes: new TrackedSet(),
       lights: new LightArray({
         // stripId : number of panels
         '0': 10,
@@ -228,6 +230,8 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this),
+      [SculptureActionCreator.HANDSHAKE_ACTIVATE]: this._actionHandshakeActivate.bind(this),
+      [SculptureActionCreator.HANDSHAKE_DEACTIVATE]: this._actionHandshakeDeactivate.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -279,6 +283,14 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionFinishStatusAnimation(payload) {
     this.restoreStatus();
+  }
+
+  _actionHandshakeActivate(payload) {
+    this.data.get('handshakes').add(payload.user);
+  }
+
+  _actionHandshakeDeactivate(payload) {
+    this.data.get('handshakes').delete(payload.user);
   }
 
   _actionPanelPressed(payload) {
