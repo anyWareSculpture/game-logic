@@ -36,13 +36,13 @@ export default class HandshakeGameLogic {
 
   _actionHandshakeActivate(payload) {
     if (payload.user === this.store.username) {
-      this._winGame();
+      this._finish();
     }
   }
 
-  _winGame() {
-    this.store.data.get('lights').deactivateAll();
-    this.store.setSuccessStatus();
+  _finish() {
+    this._complete = true;
+    this.store.moveToNextGame();
   }
 }
 

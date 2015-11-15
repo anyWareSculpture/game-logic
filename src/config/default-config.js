@@ -20,6 +20,7 @@ const Disk = require('../utils/disk');
 
 export default class DefaultConfig {
   constructor({
+      username="",
       user0="sculpture0",
       user1="sculpture1",
       user2="sculpture2"
@@ -29,7 +30,7 @@ export default class DefaultConfig {
     this.user2 = user2;
 
     // The username of the current user
-    this.username = "";
+    this.username = username || user0;
 
     // A mapping between usernames and the colors that represent them
     this.USER_COLORS = {
@@ -41,6 +42,7 @@ export default class DefaultConfig {
 
     // The sequence of the games to be run. The first game is run on startup
     this.GAMES_SEQUENCE = [
+      GAMES.HANDSHAKE,
       GAMES.MOLE,
       GAMES.DISK,
       GAMES.SIMON

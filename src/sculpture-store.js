@@ -1,7 +1,7 @@
 const events = require('events');
 
 const GAMES = require('./constants/games');
-const HandshakeGameLogic = require('./logic/mole-game-logic');
+const HandshakeGameLogic = require('./logic/handshake-game-logic');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const DiskGameLogic = require('./logic/disk-game-logic');
 const SimonGameLogic = require('./logic/simon-game-logic');
@@ -51,6 +51,13 @@ export default class SculptureStore extends events.EventEmitter {
     this.dispatcher = dispatcher;
     this.dispatchToken = this._registerDispatcher(this.dispatcher);
     this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
+  }
+
+  /**
+   * @returns {Boolean} Returns whether the handshake game is currently being played
+   */
+  get isPlayingHandshakeGame() {
+    return this.currentGameLogic instanceof HandshakeGameLogic;
   }
 
   /**
@@ -172,13 +179,13 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _startGame(game) {
-    const game_logic_classes = {
+    const gameLogicClasses = {
       [GAMES.HANDSHAKE]: HandshakeGameLogic,
       [GAMES.MOLE]: MoleGameLogic,
       [GAMES.DISK]: DiskGameLogic,
       [GAMES.SIMON]: SimonGameLogic
     };
-    const GameLogic = game_logic_classes[game];
+    const GameLogic = gameLogicClasses[game];
     if (!GameLogic) {
       throw new Error(`Unrecognized game: ${game}`);
     }
