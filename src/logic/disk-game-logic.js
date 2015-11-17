@@ -44,7 +44,7 @@ export default class DiskGameLogic {
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
 
-    var controlMappings = this.gameConfig.CONTROL_MAPPINGS;
+    const controlMappings = this.gameConfig.CONTROL_MAPPINGS;
     if (this._complete || !controlMappings.hasOwnProperty(stripId) || !controlMappings[stripId].hasOwnProperty(panelId)) {
       return;
     }

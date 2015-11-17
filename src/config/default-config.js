@@ -19,20 +19,30 @@ const GAMES = require('../constants/games');
 const Disk = require('../utils/disk');
 
 export default class DefaultConfig {
-  constructor() {
+  constructor({
+      username="",
+      user0="sculpture0",
+      user1="sculpture1",
+      user2="sculpture2"
+  } = {}) {
+    this.user0 = user0;
+    this.user1 = user1;
+    this.user2 = user2;
+
     // The username of the current user
-    this.username = "";
+    this.username = username || user0;
 
     // A mapping between usernames and the colors that represent them
     this.USER_COLORS = {
       // username : color
-      sculpture0: COLORS.USER0,
-      sculpture1: COLORS.USER1,
-      sculpture2: COLORS.USER2
+      [this.user0]: COLORS.USER0,
+      [this.user1]: COLORS.USER1,
+      [this.user2]: COLORS.USER2
     };
 
     // The sequence of the games to be run. The first game is run on startup
     this.GAMES_SEQUENCE = [
+      GAMES.HANDSHAKE,
       GAMES.MOLE,
       GAMES.DISK,
       GAMES.SIMON
@@ -142,6 +152,10 @@ export default class DefaultConfig {
       // The default color to set the panels to when
       DEFAULT_SIMON_PANEL_COLOR: "white"
     };
+  }
+
+  getUserColor(username) {
+    return this.USER_COLORS[username];
   }
 }
 

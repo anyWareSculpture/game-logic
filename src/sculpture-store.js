@@ -1,6 +1,7 @@
 const events = require('events');
 
 const GAMES = require('./constants/games');
+const HandshakeGameLogic = require('./logic/handshake-game-logic');
 const MoleGameLogic = require('./logic/mole-game-logic');
 const DiskGameLogic = require('./logic/disk-game-logic');
 const SimonGameLogic = require('./logic/simon-game-logic');
@@ -8,6 +9,7 @@ const SculptureActionCreator = require('./actions/sculpture-action-creator');
 const PanelsActionCreator = require('./actions/panels-action-creator');
 const DisksActionCreator = require('./actions/disks-action-creator');
 const TrackedData = require('./utils/tracked-data');
+const TrackedSet = require('./utils/tracked-set');
 const LightArray = require('./utils/light-array');
 const Disk = require('./utils/disk');
 
@@ -26,6 +28,7 @@ export default class SculptureStore extends events.EventEmitter {
       status: SculptureStore.STATUS_READY,
       panelAnimation: null,
       currentGame: null,
+      handshakes: new TrackedSet(),
       lights: new LightArray({
         // stripId : number of panels
         '0': 10,
@@ -37,6 +40,7 @@ export default class SculptureStore extends events.EventEmitter {
         disk1: new Disk(),
         disk2: new Disk()
       }),
+      handshake: new TrackedData(HandshakeGameLogic.trackedProperties),
       mole: new TrackedData(MoleGameLogic.trackedProperties),
       disk: new TrackedData(DiskGameLogic.trackedProperties),
       simon: new TrackedData(SimonGameLogic.trackedProperties)
@@ -47,6 +51,13 @@ export default class SculptureStore extends events.EventEmitter {
     this.dispatcher = dispatcher;
     this.dispatchToken = this._registerDispatcher(this.dispatcher);
     this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
+  }
+
+  /**
+   * @returns {Boolean} Returns whether the handshake game is currently being played
+   */
+  get isPlayingHandshakeGame() {
+    return this.currentGameLogic instanceof HandshakeGameLogic;
   }
 
   /**
@@ -168,12 +179,13 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _startGame(game) {
-    const game_logic_classes = {
+    const gameLogicClasses = {
+      [GAMES.HANDSHAKE]: HandshakeGameLogic,
       [GAMES.MOLE]: MoleGameLogic,
       [GAMES.DISK]: DiskGameLogic,
       [GAMES.SIMON]: SimonGameLogic
     };
-    const GameLogic = game_logic_classes[game];
+    const GameLogic = gameLogicClasses[game];
     if (!GameLogic) {
       throw new Error(`Unrecognized game: ${game}`);
     }
@@ -225,6 +237,8 @@ export default class SculptureStore extends events.EventEmitter {
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this),
+      [SculptureActionCreator.HANDSHAKE_ACTIVATE]: this._actionHandshakeActivate.bind(this),
+      [SculptureActionCreator.HANDSHAKE_DEACTIVATE]: this._actionHandshakeDeactivate.bind(this),
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
       [DisksActionCreator.DISK_UPDATE]: this._actionDiskUpdate.bind(this)
     };
@@ -276,6 +290,14 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionFinishStatusAnimation(payload) {
     this.restoreStatus();
+  }
+
+  _actionHandshakeActivate(payload) {
+    this.data.get('handshakes').add(payload.user);
+  }
+
+  _actionHandshakeDeactivate(payload) {
+    this.data.get('handshakes').delete(payload.user);
   }
 
   _actionPanelPressed(payload) {
