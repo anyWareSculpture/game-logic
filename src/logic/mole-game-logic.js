@@ -9,9 +9,7 @@ export default class MoleGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
     panelCount: 0, // Game progress (0..30)
-    panels: new TrackedPanels()
-    // panel -> state
-    // states: on, off, inactive
+    panels: new TrackedPanels()  // panel -> state
   };
 
   constructor(store, config) {
@@ -22,6 +20,8 @@ export default class MoleGameLogic {
     this._complete = false;
 
     this._panels = {}; // Unique panel objects. These can be used in a Set
+
+    // _remainingPanels are used to select random panels
     this._remainingPanels = new Set();
     for (let i=0;i<30;i++) {
       const stripId = Math.floor(i/10).toString();
@@ -57,7 +57,6 @@ export default class MoleGameLogic {
 
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [MoleGameActionCreator.MOVE_PANEL]: this._actionMovePanel.bind(this),
       [MoleGameActionCreator.ACTIVATE_PANEL]: this._actionActivatePanel.bind(this),
       [MoleGameActionCreator.DEACTIVATE_PANEL]: this._actionDeactivatePanel.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
@@ -72,13 +71,6 @@ export default class MoleGameLogic {
   _actionFinishStatusAnimation(payload) {
     this._complete = true;
     this.store.moveToNextGame();
-  }
-
-  _actionMovePanel({oldPanel, panel}) {
-    assert(!this._remainingPanels.has(this._getPanel(oldPanel)));
-    assert(this._remainingPanels.has(this._getPanel(panel)));
-    this._deactivatePanel(this._getPanel(oldPanel));
-    this._activatePanel(this._getPanel(panel)); // FIXME: Pause before doing this?
   }
 
   _actionActivatePanel(panel) {
@@ -122,9 +114,7 @@ export default class MoleGameLogic {
         const addPanels = 1 + (this.gameConfig.NUM_ACTIVE_PANELS[panelCount] ? this.gameConfig.NUM_ACTIVE_PANELS[panelCount] : 0);
 
         for (let i=0;i<addPanels;i++) {
-//          const {panel, lifetime} = this._nextActivePanel(panelCount);
-//          this._activatePanel(panel);
-          this._registerTimeout(null, 1000);
+          this._registerTimeout(1000); // Turn on panel after 1 second. FIXME: Make time configurable
         }
       }
     }
@@ -176,28 +166,33 @@ export default class MoleGameLogic {
     return 1000 * (Math.random() * (max - min) + min);
   }
 
+  /**
+   * If called with a panel, we'll move the panel (deactivate+pause+activate).
+   * If called without a panel we'll immediately activate a new panel
+   */
   _panelTimeout(oldPanel) {
-    // FIXME: Deal with last panel
-
     if (oldPanel) {
       delete this._activeTimeouts[oldPanel.id];
       this.moleGameActionCreator.sendDeactivatePanel(oldPanel);
-      this._registerTimeout(null, 200);
+      this._registerTimeout(200); // Turn on a new panel after 200ms. FIXME: Make time configurable
     }
     else {
       const {panel, lifetime} = this._nextActivePanel(this.data.get("panelCount"));
       this.moleGameActionCreator.sendActivatePanel(panel);
-      this._registerTimeout(panel, lifetime);
+      this._registerTimeout(lifetime, panel);
     }
   }
 
-  _registerTimeout(panel, lifetime) {
-    if (lifetime > 0) {
-      const timeout = setTimeout(this._panelTimeout.bind(this, panel), lifetime);
-      if (panel) this._activeTimeouts[panel.id] = timeout;
+  /**
+   * Call without panel to request a new panel after the given timeout
+   * Call with panel to turn off the panel after the given timeout
+   */
+  _registerTimeout(timeout, panel = null) {
+    if (timeout > 0) {
+      const tid = setTimeout(this._panelTimeout.bind(this, panel), timeout);
+      if (panel) this._activeTimeouts[panel.id] = tid;
     }
   }
-
 
   // FIXME: The panel should also pulse. Should the pulsating state be part of tracked data, or should each view deduce this from the current game and state?
   _activatePanel(panel) {
@@ -213,17 +208,16 @@ export default class MoleGameLogic {
     const lightArray = this.store.data.get('lights');
     lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.INACTIVE_PANEL_INTENSITY);
   }
-
+  
   _colorPanel(panel) {
     this.data.get('panels').setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_IGNORED);
     const lightArray = this.store.data.get('lights');
     lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.COLORED_PANEL_INTENSITY);
     lightArray.setColor(panel.stripId, panel.panelId, this.config.USER_COLORS[this.config.username]);
   }
-
+  
   _winGame() {
     this.store.data.get('lights').deactivateAll();
     this.store.setSuccessStatus();
   }
 }
-
