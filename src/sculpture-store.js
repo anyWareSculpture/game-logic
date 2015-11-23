@@ -315,7 +315,17 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     const {stripId, panelId, pressed} = payload;
-    this.data.get('lights').activate(stripId, panelId, pressed);
+
+    const lightArray = this.data.get('lights');
+    lightArray.activate(stripId, panelId, pressed);
+    // This is a reasonable default behaviour that can be overridden in
+    // a game logic class if necessary
+    if (pressed) {
+      lightArray.setColor(stripId, panelId, this.userColor);
+    }
+    else {
+      lightArray.setDefaultColor(stripId, panelId);
+    }
   }
 
   _actionDiskUpdate(payload) {
