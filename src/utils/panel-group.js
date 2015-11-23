@@ -1,21 +1,21 @@
 const TrackedData = require('./tracked-data');
 
-export class TrackedPanelSet extends TrackedData {
+export class TrackedPanels extends TrackedData {
+
+  static STATE_ON = "on";
+  static STATE_OFF = "off"; // default
+  static STATE_IGNORED = "ignored";
+
   constructor() {
     super();
   }
 
-  addPanel(stripId, panelId) {
-    this.set(this._hash(stripId, panelId), true);
+  setPanelState(stripId, panelId, state) {
+    this.set(this._hash(stripId, panelId), state);
   }
 
-  hasPanel(stripId, panelId) {
-    const key = this._hash(stripId, panelId);
-    return this.has(key) && this.get(key);
-  }
-
-  deletePanel(stripId, panelId) {
-    this.set(this._hash(stripId, panelId), false);
+  getPanelState(stripId, panelId) {
+    return this.get(this._hash(stripId, panelId)) || TrackedData.STATE_OFF;
   }
 
   get numPanels() {
