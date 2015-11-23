@@ -28,6 +28,7 @@ node_modules
 
 # Distribution directory
 dist/
+lib/
 
 ### Vim ###
 [._]*.s[a-w][a-z]

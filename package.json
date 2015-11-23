@@ -1,8 +1,7 @@
 {
   "name": "@anyware/game-logic",
-  "version": "10.0.3",
+  "version": "11.1.0",
   "description": "Game logic for anyWare",
-  "main": "dist/index.js",
   "directories": {
     "test": "test"
   },

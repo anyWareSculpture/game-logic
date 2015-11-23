@@ -2,25 +2,19 @@ const PanelsActionCreator = require('../actions/panels-action-creator');
 const SculptureActionCreator = require('../actions/sculpture-action-creator');
 const PanelGroup = require('../utils/panel-group');
 
-const TARGET_PANEL_GROUPS = [
-  // [[stripId, panelId], ...],
-  [['0', '3'], ['1', '3'], ['2', '3']],
-  [['0', '4'], ['1', '5']],
-  [['0', '3'], ['0', '5'], ['2', '4']]
-].map((panels) => new PanelGroup(panels));
-
-const TARGET_PANEL_INTENSITY = 100;
-const PANEL_OFF_INTENSITY = 0;
-
 export default class MoleGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
     targetIndex: 0
   };
 
-  constructor(store) {
+  constructor(store, config) {
     this.store = store;
+    this.config = config;
+    this.gameConfig = config.MOLE_GAME;
     
+    // target panel groups are loaded each time when start() is called
+    this._targetPanelGroups = null;
     this._complete = false;
     this._currentTarget = null;
   }
@@ -30,6 +24,7 @@ export default class MoleGameLogic {
   }
 
   start() {
+    this._targetPanelGroups = this.gameConfig.TARGET_PANEL_GROUPS.map((panels) => new PanelGroup(panels));
     this.data.set("targetIndex", 0);
     this._enableCurrentTarget();
   }
@@ -98,7 +93,7 @@ export default class MoleGameLogic {
   _enableCurrentTarget() {
     const targetIndex = this.data.get("targetIndex");
 
-    if (targetIndex >= TARGET_PANEL_GROUPS.length) {
+    if (targetIndex >= this._targetPanelGroups.length) {
       this._winGame();
       return;
     }
@@ -111,18 +106,18 @@ export default class MoleGameLogic {
   _enablePanels(panels) {
     const lightArray = this.store.data.get('lights');
     for (let [stripId, panelId] of panels) {
-      lightArray.setIntensity(stripId, panelId, TARGET_PANEL_INTENSITY);
+      lightArray.setIntensity(stripId, panelId, this.gameConfig.TARGET_PANEL_INTENSITY);
     }
   }
 
   _disablePanel(stripId, panelId) {
     const lightArray = this.store.data.get('lights');
-    lightArray.setIntensity(stripId, panelId, PANEL_OFF_INTENSITY);
+    lightArray.setIntensity(stripId, panelId, this.gameConfig.PANEL_OFF_INTENSITY);
   }
 
   _getTargetPanels(index) {
     // Make sure this gets copied so the constant never gets overwritten
-    return new PanelGroup(TARGET_PANEL_GROUPS[index]);
+    return new PanelGroup(this._targetPanelGroups[index]);
   }
 
   _winGame() {

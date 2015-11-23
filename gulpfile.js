@@ -28,7 +28,7 @@ require('@anyware/gulp-utils/tasks/transpile-task')(
   gulp,
   'build', // taskName
   'src/**/*.js', // targetFiles
-  'dist' // destinationDirectory
+  'lib' // destinationDirectory
 );
 
 gulp.task('default', function(callback) {
