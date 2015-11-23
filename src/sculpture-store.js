@@ -349,6 +349,7 @@ export default class SculptureStore extends events.EventEmitter {
     const mergeFunctions = {
       status: this._mergeStatus.bind(this),
       currentGame: this._mergeCurrentGame.bind(this),
+      handshakes: this._mergeHandshakes.bind(this),
       lights: this._mergeLights.bind(this),
       disks: this._mergeDisks.bind(this),
       mole: this._mergeMole.bind(this),
@@ -370,6 +371,20 @@ export default class SculptureStore extends events.EventEmitter {
 
   _mergeCurrentGame(newCurrentGame, metadata) {
     this._startGame(newCurrentGame);
+  }
+
+  _mergeHandshakes(handshakesChanges) {
+    const handshakes = this.data.get('handshakes');
+
+    for (let username of Object.keys(handshakesChanges)) {
+      const value = handshakesChanges[username];
+      if (value) {
+        handshakes.add(username);
+      }
+      else {
+        handshakes.delete(username);
+      }
+    }
   }
 
   _mergeLights(lightChanges, metadata) {
