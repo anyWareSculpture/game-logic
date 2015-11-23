@@ -1,11 +1,15 @@
+const assert = require('assert');
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const SculptureActionCreator = require('../actions/sculpture-action-creator');
-const PanelGroup = require('../utils/panel-group');
+const MoleGameActionCreator = require('../actions/mole-game-action-creator');
+const {TrackedPanelSet, PanelSet} = require('../utils/panel-group');
+const TrackedSet = require('../utils/tracked-set');
 
 export default class MoleGameLogic {
   // These are automatically added to the sculpture store
   static trackedProperties = {
-    targetIndex: 0
+    panelCount: 0, // Game progress (0..30)
+    activePanels: new TrackedPanelSet() // hash([stripId, panelId]) -> bool
   };
 
   constructor(store, config) {
@@ -13,10 +17,20 @@ export default class MoleGameLogic {
     this.config = config;
     this.gameConfig = config.MOLE_GAME;
     
-    // target panel groups are loaded each time when start() is called
-    this._targetPanelGroups = null;
     this._complete = false;
-    this._currentTarget = null;
+
+    this._panels = {}; // Unique panel objects. These can be used in a Set
+    this._remainingPanels = new Set();
+    for (let i=0;i<30;i++) {
+      const stripId = Math.floor(i/10).toString();
+      const panelId = (i%10).toString();
+      const panel = { stripId, panelId, id: this._hash(stripId, panelId) };
+      this._panels[panel.id] = panel;
+      this._remainingPanels.add(panel);
+    }
+    this._activeTimeouts = {};
+
+    this.moleGameActionCreator = new MoleGameActionCreator(this.store.dispatcher);
   }
 
   get data() {
@@ -24,11 +38,16 @@ export default class MoleGameLogic {
   }
 
   start() {
-    this._targetPanelGroups = this.gameConfig.TARGET_PANEL_GROUPS.map((panels) => new PanelGroup(panels));
-    this.data.set("targetIndex", 0);
-    this._enableCurrentTarget();
+    this.data.set("panelCount", 0);
+    const {panel, lifetime} = this._nextActivePanel(0);
+    this._activatePanel(panel);
   }
 
+  /**
+   * handleActionPayload must _synchronously_ change tracked data in sculpture store.
+   * Any asynchronous behavior must happen by dispatching actions.
+   * We're _not_ allowed to dispatch actions synchronously.
+   */
   handleActionPayload(payload) {
     if (this._complete) {
       return;
@@ -36,6 +55,9 @@ export default class MoleGameLogic {
 
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
+      [MoleGameActionCreator.MOVE_PANEL]: this._actionMovePanel.bind(this),
+      [MoleGameActionCreator.ACTIVATE_PANEL]: this._actionActivatePanel.bind(this),
+      [MoleGameActionCreator.DEACTIVATE_PANEL]: this._actionDeactivatePanel.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
@@ -45,58 +67,154 @@ export default class MoleGameLogic {
     }
   }
 
-  _actionPanelPressed(payload) {
-    let {stripId, panelId, pressed} = payload;
-
-    if (this._currentTarget.has(stripId, panelId)) {
-      this._currentTarget.delete(stripId, panelId);
-      this._disablePanel(stripId, panelId);
-      this._updateTarget();
-    }
-  }
-
   _actionFinishStatusAnimation(payload) {
     this._complete = true;
     this.store.moveToNextGame();
   }
 
-  _updateTarget() {
-    if (this._currentTarget.size === 0) {
-      const targetIndex = this.data.get("targetIndex");
-      this.data.set("targetIndex", targetIndex + 1);
+  _actionMovePanel({oldPanel, panel}) {
+    assert(!this._remainingPanels.has(this._getPanel(oldPanel)));
+    assert(this._remainingPanels.has(this._getPanel(panel)));
+    this._deactivatePanel(this._getPanel(oldPanel));
+    this._activatePanel(this._getPanel(panel)); // FIXME: Pause before doing this?
+  }
 
-      this._enableCurrentTarget();
+  _actionActivatePanel(panel) {
+    assert(this._remainingPanels.has(this._getPanel(panel)));
+    this._activatePanel(this._getPanel(panel));
+  }
+
+  _actionDeactivatePanel(panel) {
+    assert(!this._remainingPanels.has(this._getPanel(panel)));
+    this._deactivatePanel(this._getPanel(panel));
+  }
+
+  /**
+   * If an active panel is pressed:
+   * o Turn panel to location color
+   * o Wait a short moment
+   * o Turn on the next panel
+   * o increase/decrease # of simulaneously active panels
+   */
+  _actionPanelPressed(payload) {
+    let {stripId, panelId, pressed} = payload;
+    const panel = this._getPanel(payload);
+
+    // If we have a timeout on this panel, kill the timeout
+    if (this._activeTimeouts.hasOwnProperty(panel.id)) {
+      clearTimeout(this._activeTimeouts[panel.id]);
+      delete this._activeTimeouts[panel.id];
+    }
+
+    // If an active panel was taouched
+    if (this.data.get('activePanels').hasPanel(stripId, panelId)) {
+      this._colorPanel(panel);
+
+      // Next panel
+      let panelCount = this.data.get("panelCount") + 1;
+      if (panelCount == 30) {
+        this._wingame();
+      }
+      else {
+        this.data.set("panelCount", panelCount);
+        const addPanels = 1 + (this.gameConfig.NUM_ACTIVE_PANELS[panelCount] ? this.gameConfig.NUM_ACTIVE_PANELS[panelCount] : 0);
+
+        for (let i=0;i<addPanels;i++) {
+//          const {panel, lifetime} = this._nextActivePanel(panelCount);
+//          this._activatePanel(panel);
+          this._registerTimeout(null, 1000);
+        }
+      }
     }
   }
 
-  _enableCurrentTarget() {
-    const targetIndex = this.data.get("targetIndex");
-
-    if (targetIndex >= this._targetPanelGroups.length) {
-      this._winGame();
-      return;
-    }
-
-    const targetPanels = this._getTargetPanels(targetIndex);
-    this._currentTarget = targetPanels;
-    this._enablePanels(targetPanels);
+  _hash(stripId, panelId) {
+    return `${stripId},${panelId}`;
   }
 
-  _enablePanels(panels) {
+  _getPanel({stripId, panelId}) {
+    return this._panels[this._hash(stripId, panelId)];
+  }
+
+  // Returns {panel, lifetime}
+  _nextActivePanel(count) {
+    if (count < this.gameConfig.INITIAL_PANELS.length) {
+      const [stripId, panelId] = this.gameConfig.INITIAL_PANELS[count];
+      return { panel: this._getPanel({stripId, panelId}), lifetime: 0 }; // No timeout
+    }
+    return { panel: this._getRandomPanel(count), lifetime: this._getRandomLifetime(count)};
+  }
+
+  _getRandomPanel(count) {
+    const idx = Math.floor(Math.random() * this._remainingPanels.size);
+    const iter = this._remainingPanels.values();
+    let curr = iter.next();
+    for (let i=0;i<idx;i++) curr = iter.next();
+    return curr.value;
+  }
+
+  _getRandomLifetime(count) {
+    // find last and next lifetime values for interpolation
+    let last, next;
+    for (let elem of this.gameConfig.PANEL_LIFETIME) {
+      if (!last || elem.count <= count) last = elem;
+      next = elem;
+      if (elem.count > count) break;
+    }
+
+    let min, max;
+    if (last === next) {
+      min = last.range[0];
+      max = last.range[1];
+    }
+    else {
+      min = last.range[0] + (next.range[0] - last.range[0]) * (count - last.range[0]) / (next.count - last.count);
+      max = last.range[1] + (next.range[1] - last.range[1]) * (count - last.range[1]) / (next.count - last.count);
+    }
+    return 1000 * (Math.random() * (max - min) + min);
+  }
+
+  _panelTimeout(oldPanel) {
+    // FIXME: Deal with last panel
+
+    if (oldPanel) delete this._activeTimeouts[oldPanel.id];
+
+    const {panel, lifetime} = this._nextActivePanel(this.data.get("panelCount"));
+
+    if (oldPanel) this.moleGameActionCreator.sendDeactivatePanel(oldPanel);
+    this.moleGameActionCreator.sendActivatePanel(panel);
+
+    this._registerTimeout(panel, lifetime);
+  }
+
+  _registerTimeout(panel, lifetime) {
+    if (lifetime > 0) {
+      const timeout = setTimeout(this._panelTimeout.bind(this, panel), lifetime);
+      if (panel) this._activeTimeouts[panel.id] = timeout;
+    }
+  }
+
+
+  // FIXME: The panel should also pulse. Should the pulsating state be part of tracked data, or should each view deduce this from the current game and state?
+  _activatePanel(panel) {
+    this.data.get('activePanels').addPanel(panel.stripId, panel.panelId);
+    this._remainingPanels.delete(panel);
     const lightArray = this.store.data.get('lights');
-    for (let [stripId, panelId] of panels) {
-      lightArray.setIntensity(stripId, panelId, this.gameConfig.TARGET_PANEL_INTENSITY);
-    }
+    lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.ACTIVE_PANEL_INTENSITY);
   }
 
-  _disablePanel(stripId, panelId) {
+  _deactivatePanel(panel) {
+    this._remainingPanels.add(panel);
+    this.data.get('activePanels').deletePanel(panel.stripId, panel.panelId);
     const lightArray = this.store.data.get('lights');
-    lightArray.setIntensity(stripId, panelId, this.gameConfig.PANEL_OFF_INTENSITY);
+    lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.INACTIVE_PANEL_INTENSITY);
   }
 
-  _getTargetPanels(index) {
-    // Make sure this gets copied so the constant never gets overwritten
-    return new PanelGroup(this._targetPanelGroups[index]);
+  _colorPanel(panel) {
+    this.data.get('activePanels').deletePanel(panel.stripId, panel.panelId);
+    const lightArray = this.store.data.get('lights');
+    lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.COLORED_PANEL_INTENSITY);
+    lightArray.setColor(panel.stripId, panel.panelId, this.config.USER_COLORS[this.config.username]);
   }
 
   _winGame() {

@@ -51,19 +51,28 @@ export default class DefaultConfig {
     /******* GAMES CONFIGURATION *******/
 
     this.MOLE_GAME = {
-      TARGET_PANEL_GROUPS: [
-        // Each group will be lit up one at a time
-        // When every panel in the group has been pressed, the next group will turn on
-        // After the last group the game will end
-        // [[stripId, panelId], ...],
-        [['0', '3'], ['1', '3'], ['2', '3']],
-        [['0', '4'], ['1', '5']],
-        [['0', '3'], ['0', '5'], ['2', '4']]
+      INITIAL_PANELS: [
+        ['0', '3'],
+        ['0', '7'],
+        ['2', '6']
       ],
-      // The intensity to use on the lit up panels
-      TARGET_PANEL_INTENSITY: 100,
-      // The intensity to use once a panel has been pressed
-      PANEL_OFF_INTENSITY: 0
+      NUM_ACTIVE_PANELS: {
+        10: 1, // At panelCount of 10, increase # of simultaneusly active panels
+        20: 1,
+        25: -1, // At panelCount of 25, decrease # of simultaneusly active panels
+        27: -1
+      },
+      PANEL_LIFETIME: [
+        {count: 4, range: [4, 6]}, // At panelCount of 4, set panel lifetime to 4-6 seconds. Gradually interpolate to next timeout level
+        {count: 20, range: [2, 3]},
+        {count: 30, range: [1.5, 2]}
+      ],
+      // The intensity to use on the active panels
+      ACTIVE_PANEL_INTENSITY: 100,
+      // The intensity to use on the active panels
+      INACTIVE_PANEL_INTENSITY: 0,
+      // The intensity to use on the inactive panels (panels turned to location color)
+      COLORED_PANEL_INTENSITY: 75
     };
 
     this.DISK_GAME = {

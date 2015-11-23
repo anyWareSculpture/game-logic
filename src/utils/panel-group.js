@@ -1,68 +1,58 @@
-export default class PanelGroup {
-  constructor(iterable) {
-    this._panels = new Set();
+const TrackedData = require('./tracked-data');
 
-    this.addAll(iterable || []);
+export class TrackedPanelSet extends TrackedData {
+  constructor() {
+    super();
   }
 
-  get size() {
-    return this._panels.size;
+  addPanel(stripId, panelId) {
+    this.set(this._hash(stripId, panelId), true);
   }
 
-  addAll(iterable) {
-    for (let [stripId, panelId] of iterable) {
-      this.add(stripId, panelId);
-    }
+  hasPanel(stripId, panelId) {
+    const key = this._hash(stripId, panelId);
+    return this.has(key) && this.get(key);
   }
 
-  add(stripId, panelId) {
-    this._panels.add(this._hash(stripId, panelId));
+  deletePanel(stripId, panelId) {
+    this.set(this._hash(stripId, panelId), false);
   }
 
-  has(stripId, panelId) {
-    return this._panels.has(this._hash(stripId, panelId));
-  }
-
-  delete(stripId, panelId) {
-    this._panels.delete(this._hash(stripId, panelId));
-  }
-
-  clear() {
-    return this._panels.clear();
-  }
-
-  *entries() {
-    for (let value of this.values()) {
-      yield [value, value];
-    }
-  }
-
-  *values() {
-    for (let hashedValue of this._panels.values()) {
-      yield this._parseHash(hashedValue);
-    }
-  }
-
-  keys() {
-    return this.values();
-  }
-
-  forEach(callback, thisArg) {
-    for (let value of this.values()) {
-      callback.call(thisArg, value);
-    }
-  }
+  get numPanels() {
+    return Object.keys(_this.data).length;
+  } 
 
   _hash(stripId, panelId) {
     return `${stripId},${panelId}`;
   }
-
-  _parseHash(hash) {
-    return hash.split(',', 2);
-  }
-
-  [Symbol.iterator]() {
-    return this.values();
-  }
 }
 
+export class PanelSet {
+  constructor() {
+    this._set = {};
+  }
+
+  addPanel(panel) {
+    this._set[this._hash(panel)] = panel;
+  }
+
+  hasPanel(panel) {
+    return this._set.hasOwnProperty(this._hash(panel));
+  }
+
+  deletePanel(panel) {
+    delete this._set[this._hash(panel)];
+  }
+
+  get size() {
+    return Object.keys(this._set).length;
+  }
+
+  *values() {
+    for (let key of Object.values(this._set)) yield key;
+  }
+
+  _hash([stripId, panelId]) {
+    return `${stripId},${panelId}`;
+  }
+}
