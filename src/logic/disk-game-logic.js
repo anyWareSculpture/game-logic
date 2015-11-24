@@ -94,7 +94,7 @@ export default class DiskGameLogic {
   _checkWinConditions(disks) {
     for (let diskId of Object.keys(this._targetPositions)) {
       const targetPosition = this._targetPositions[diskId];
-      if (disks.get(diskId).getPosition() !== targetPosition) {
+      if (Math.abs(disks.get(diskId).getPosition() - targetPosition) > this.gameConfig.TOLERANCE) {
         return false;
       }
     }
