@@ -41,6 +41,7 @@ export default class MoleGameLogic {
 
   start() {
     this.data.set("panelCount", 0);
+    // FIXME: Reset panels to empty object
     const {panel, lifetime} = this._nextActivePanel(0);
     this._activatePanel(panel);
   }
