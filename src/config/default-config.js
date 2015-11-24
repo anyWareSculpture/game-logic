@@ -50,6 +50,9 @@ export default class DefaultConfig {
 
     /******* GAMES CONFIGURATION *******/
 
+    this.HANDSHAKE_GAME = {
+      TRANSITION_OUT_TIME: 4000
+    },
     this.MOLE_GAME = {
       INITIAL_PANELS: [
         ['0', '3'],
