@@ -67,24 +67,25 @@ export default class DefaultConfig {
     };
 
     this.DISK_GAME = {
-      // The user will wins when they reach these positions for each diskId
+      // The user will wins when they reach these positions for each diskId, within the given tolerance
+      TOLERANCE: 3, // degrees
       TARGET_POSITIONS_LEVELS: [
         // level 0
         {
           // diskId: target position
-          disk0: 10,
-          disk1: 15,
-          disk2: 20
+          disk0: 90,
+          disk1: 180,
+          disk2: 270
         },
         {
-          disk0: 5,
-          disk1: 10,
-          disk2: 15
+          disk0: 45,
+          disk1: 225,
+          disk2: 90
         },
         {
-          disk0: 2,
-          disk1: 3,
-          disk2: 5
+          disk0: 120,
+          disk1: 70,
+          disk2: 100
         }
       ],
       CONTROL_MAPPINGS: {
@@ -102,7 +103,7 @@ export default class DefaultConfig {
             disk2: Disk.CLOCKWISE
           }
         },
-        '1': {
+        '2': {
           // panelId
           '3': {
             // diskId
