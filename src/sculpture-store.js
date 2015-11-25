@@ -173,9 +173,7 @@ export default class SculptureStore extends events.EventEmitter {
    * Starts the next game in the game sequence
    */
   moveToNextGame() {
-    const nextGame = this._getNextGame();
-
-    this._startGame(nextGame);
+    this._startGame(this._getNextGame());
   }
 
   _startGame(game) {
@@ -260,7 +258,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionStartNextGame() {
-    this._startGame(this._getNextGame());
+    this.moveToNextGame();
   }
 
   _actionMergeState(payload) {
