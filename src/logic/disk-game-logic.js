@@ -26,6 +26,7 @@ export default class DiskGameLogic {
 
   start() {
     this._level = DEFAULT_LEVEL;
+    this._complete = false;
   }
 
   handleActionPayload(payload) {
