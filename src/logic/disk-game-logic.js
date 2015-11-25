@@ -91,12 +91,31 @@ export default class DiskGameLogic {
     }
   }
 
+  /**
+   * Win conditions:
+   * o The three disks needs to be _relatively_ aligned within RELATIVE_TOLERANCE
+   * o Any disk must be aligned within ABSOLUTE_TOLERANCE
+   */
   _checkWinConditions(disks) {
+    let prevDiskId = null;
     for (let diskId of Object.keys(this._targetPositions)) {
-      const targetPosition = this._targetPositions[diskId];
-      if (Math.abs(disks.get(diskId).getPosition() - targetPosition) > this.gameConfig.TOLERANCE) {
+      const targetPos = this._targetPositions[diskId];
+      const currDisk = disks.get(diskId);
+      const diskPos = currDisk.getPosition();
+
+      // Check position relative to neighbor disk
+      if (prevDiskId) {
+        if (Math.abs((targetPos - this._targetPositions[prevDiskId]) -
+                     (diskPos - disks.get(prevDiskId).getPosition())) > 
+                     this.gameConfig.RELATIVE_TOLERANCE) {
+          return false;
+        }
+      }
+      // Check absolute position
+      if (Math.abs(diskPos - targetPos) > this.gameConfig.ABSOLUTE_TOLERANCE) {
         return false;
       }
+      prevDiskId = diskId;
     }
 
     this._winGame();

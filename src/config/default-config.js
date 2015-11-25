@@ -67,8 +67,9 @@ export default class DefaultConfig {
     };
 
     this.DISK_GAME = {
-      // The user will wins when they reach these positions for each diskId, within the given tolerance
-      TOLERANCE: 3, // degrees
+      // The user will wins when they reach these positions for each diskId.
+      RELATIVE_TOLERANCE: 3, // degrees tolerance for disks relative to each other
+      ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
       TARGET_POSITIONS_LEVELS: [
         // level 0
         {
@@ -91,30 +92,22 @@ export default class DefaultConfig {
       CONTROL_MAPPINGS: {
         // stripId
         '0': {
-          // panelId
-          '3': {
-            // diskId
-            disk0: Disk.CLOCKWISE
-          },
-          '4': {
-            disk1: Disk.CLOCKWISE
-          },
-          '5': {
-            disk2: Disk.CLOCKWISE
-          }
+          // panelId -- diskId
+          '1': { disk0: Disk.COUNTERCLOCKWISE },
+          '2': { disk0: Disk.COUNTERCLOCKWISE },
+          '4': { disk1: Disk.COUNTERCLOCKWISE },
+          '5': { disk1: Disk.COUNTERCLOCKWISE },
+          '7': { disk2: Disk.COUNTERCLOCKWISE },
+          '8': { disk2: Disk.COUNTERCLOCKWISE }
         },
         '2': {
-          // panelId
-          '3': {
-            // diskId
-            disk0: Disk.COUNTERCLOCKWISE
-          },
-          '4': {
-            disk1: Disk.COUNTERCLOCKWISE
-          },
-          '5': {
-            disk2: Disk.COUNTERCLOCKWISE
-          }
+          // panelId -- diskId
+          '1': { disk0: Disk.CLOCKWISE },
+          '2': { disk0: Disk.CLOCKWISE },
+          '4': { disk1: Disk.CLOCKWISE },
+          '5': { disk1: Disk.CLOCKWISE },
+          '7': { disk2: Disk.CLOCKWISE },
+          '8': { disk2: Disk.CLOCKWISE }
         }
       }
     };
