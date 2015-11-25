@@ -131,17 +131,17 @@ export default class DefaultConfig {
           stripId: '0',
           // Each array of panel IDs is lit up one at a time
           // Each array within this array is called a "frame" in the "sequence"
-          panelSequence: [['3'], ['4'], ['5']]
+          panelSequence: [['3'], ['5'], ['7']]
         },
         // level 1 sequence
         {
           stripId: '1',
-          panelSequence: [['3'], ['5'], ['4']]
+          panelSequence: [['1'], ['8'], ['5']]
         },
         // level 2 sequence
         {
           stripId: '2',
-          panelSequence: [['3'], ['5'], ['4'], ['6']]
+          panelSequence: [['3'], ['6'], ['2'], ['9']]
         }
       ],
       // The intensity of the panels when they are pressed or when the sequence is playing
