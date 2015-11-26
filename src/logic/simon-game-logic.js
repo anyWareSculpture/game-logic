@@ -43,7 +43,7 @@ export default class SimonGameLogic {
   end() {
     let lights = this.store.data.get('lights');
     lights.deactivateAll();
-    _.each(lights.stripIds, (id) => lights.setIntensity(id, null, 0));
+    lights.stripIds.forEach((id) => lights.setIntensity(id, null, 0));
   }
 
   handleActionPayload(payload) {
