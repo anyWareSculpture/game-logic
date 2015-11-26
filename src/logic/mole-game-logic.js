@@ -29,6 +29,12 @@ export default class MoleGameLogic {
     this._enableCurrentTarget();
   }
 
+  end() {
+    let lights = this.store.data.get('lights');
+    lights.deactivateAll();
+    _.each(lights.stripIds, (id) => this._disablePanel(id));
+  }
+
   handleActionPayload(payload) {
     if (this._complete) {
       return;

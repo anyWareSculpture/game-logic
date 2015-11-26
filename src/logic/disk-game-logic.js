@@ -28,6 +28,12 @@ export default class DiskGameLogic {
     this._level = DEFAULT_LEVEL;
   }
 
+  end() {
+    let lights = this.store.data.get('lights');
+    lights.deactivateAll();
+    _.each(lights.stripIds, (id) => lights.setIntensity(id, null, 0));;
+  }
+
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
