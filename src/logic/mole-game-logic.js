@@ -32,7 +32,7 @@ export default class MoleGameLogic {
   end() {
     let lights = this.store.data.get('lights');
     lights.deactivateAll();
-    lights.stripIds.forEach((id) => this._disablePanel(id));
+    this.config.LIGHTS.GAME_STRIPS.forEach((id) => this._disablePanel(id));
   }
 
   handleActionPayload(payload) {

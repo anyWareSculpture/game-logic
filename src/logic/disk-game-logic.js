@@ -31,7 +31,7 @@ export default class DiskGameLogic {
   end() {
     let lights = this.store.data.get('lights');
     lights.deactivateAll();
-    lights.stripIds.forEach((id) => lights.setIntensity(id, null, 0));
+    this.config.LIGHTS.GAME_STRIPS.forEach((id) => lights.setIntensity(id, null, 0));
   }
 
   handleActionPayload(payload) {
