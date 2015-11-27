@@ -28,6 +28,12 @@ export default class DiskGameLogic {
     this._level = DEFAULT_LEVEL;
   }
 
+  end() {
+    let lights = this.store.data.get('lights');
+    lights.deactivateAll();
+    this.config.LIGHTS.GAME_STRIPS.forEach((id) => lights.setIntensity(id, null, 0));
+  }
+
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
@@ -94,7 +100,7 @@ export default class DiskGameLogic {
   _checkWinConditions(disks) {
     for (let diskId of Object.keys(this._targetPositions)) {
       const targetPosition = this._targetPositions[diskId];
-      if (disks.get(diskId).getPosition() !== targetPosition) {
+      if (Math.abs(disks.get(diskId).getPosition() - targetPosition) > this.gameConfig.TOLERANCE) {
         return false;
       }
     }

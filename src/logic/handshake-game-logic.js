@@ -19,6 +19,10 @@ export default class HandshakeGameLogic {
   start() {
   }
 
+  end() {
+    this.store.data.get('lights').deactivateAll();
+  }
+
   handleActionPayload(payload) {
     if (this._complete) {
       return;

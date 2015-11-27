@@ -9,8 +9,6 @@ const TrackedData = require('./tracked-data');
 export default class TrackedSet extends TrackedData {
   constructor() {
     super();
-
-    this._set = new Set();
   }
 
   add(value) {
