@@ -48,6 +48,11 @@ export default class DefaultConfig {
       GAMES.SIMON
     ];
 
+    /******* LIGHTS ********************/
+    this.LIGHTS = {
+      GAME_STRIPS: ['0','1','2']
+    }
+
     /******* GAMES CONFIGURATION *******/
 
     this.MOLE_GAME = {
