@@ -220,7 +220,7 @@ export default class MoleGameLogic {
     this.data.get('panels').setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_IGNORED);
     const lightArray = this.store.data.get('lights');
     lightArray.setIntensity(panel.stripId, panel.panelId, this.gameConfig.COLORED_PANEL_INTENSITY);
-    lightArray.setColor(panel.stripId, panel.panelId, this.config.USER_COLORS[this.config.username]);
+    lightArray.setColor(panel.stripId, panel.panelId, this.store.userColor);
   }
   
   _winGame() {
