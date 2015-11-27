@@ -52,7 +52,7 @@ export default class DefaultConfig {
     this.LIGHTS = {
       GAME_STRIPS: ['0','1','2'],
       PERIMETER_STRIP: '3',
-      DISK_LIGHT_STRIP: '4'
+      DISK_LIGHT_STRIP: '4',
       HANDSHAKE_STRIP: '5',
       ENVIRONMENT_STRIP: '6'
     }
@@ -107,22 +107,22 @@ export default class DefaultConfig {
         // disks: { diskId: target position }
         // perimeter: { stripId: [panelIds..] }
         { disks:     { disk2: 63, disk1: 111, disk0: 333 },
-          perimeter: { this.LIGHTS.PERIMETER: ['0', '2']  }
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2']  }
         },
         // level 1
         { disks:     { disk2: 331,  disk1: 25, disk0: 51 },
-          perimeter: { this.LIGHTS.PERIMETER: ['1', '4']  }
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4']  }
         },
         // level 2
         { disks:     { disk2: 0, disk1: 77,  disk0: 314 },
-          perimeter: { this.LIGHTS.PERIMETER: ['3', '5']  }
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5']  }
         }
       ],
       LIGHT_MAPPING: {
         // diskId: { stripId: panelId }
-        disk0: { this.LIGHTS.DISK_LIGHT_STRIP: '0' },
-        disk1: { this.LIGHTS.DISK_LIGHT_STRIP: '1' },
-        disk2: { this.LIGHTS.DISK_LIGHT_STRIP: '2' }
+        disk0: { [this.LIGHTS.DISK_LIGHT_STRIP]: '0' },
+        disk1: { [this.LIGHTS.DISK_LIGHT_STRIP]: '1' },
+        disk2: { [this.LIGHTS.DISK_LIGHT_STRIP]: '2' }
       },
       CONTROL_MAPPINGS: {
         // stripId
