@@ -40,7 +40,7 @@ export default class SculptureStore extends events.EventEmitter {
         [this.config.LIGHTS.PERIMETER_STRIP]: 6,
         [this.config.LIGHTS.DISK_LIGHT_STRIP]: 3,
         [this.config.LIGHTS.HANDSHAKE_STRIP]: 4,
-        [this.config.LIGHTS.ENVIRONMENT_STRIP]: 3
+        [this.config.LIGHTS.ART_LIGHTS_STRIP]: 3
       }),
       disks: new TrackedData({
         disk0: new Disk(),
