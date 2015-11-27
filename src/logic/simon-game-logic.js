@@ -164,7 +164,7 @@ export default class SimonGameLogic {
     return this._createFrame(stripId, () => {
       for (let panelId of panelIds) {
         this._lights.setIntensity(stripId, panelId, this.gameConfig.TARGET_PANEL_INTENSITY);
-        this._lights.setColor(stripId, panelId, this.store.userColor);
+        this._lights.setColor(stripId, panelId, this.gameConfig.DEFAULT_SIMON_PANEL_COLOR);
       }
     });
   }
