@@ -179,7 +179,9 @@ export default class DefaultConfig {
       // The time after input to wait for the user to finish the sequence
       INPUT_TIMEOUT: 10000,
       // The default color to set the panels to when
-      DEFAULT_SIMON_PANEL_COLOR: "white"
+      DEFAULT_SIMON_PANEL_COLOR: "white",
+      // Wait while playing final sound
+      TRANSITION_OUT_TIME: 10000
     };
   }
 
