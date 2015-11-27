@@ -50,7 +50,11 @@ export default class DefaultConfig {
 
     /******* LIGHTS ********************/
     this.LIGHTS = {
-      GAME_STRIPS: ['0','1','2']
+      GAME_STRIPS: ['0','1','2'],
+      PERIMETER_STRIP: '3',
+      DISK_LIGHT_STRIP: '4'
+      HANDSHAKE_STRIP: '5',
+      ENVIRONMENT_STRIP: '6'
     }
 
     /******* GAMES CONFIGURATION *******/
