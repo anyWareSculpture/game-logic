@@ -57,9 +57,9 @@ export default class DefaultConfig {
 
     this.MOLE_GAME = {
       INITIAL_PANELS: [
-        ['0', '3'],
-        ['0', '7'],
-        ['2', '6']
+        {stripId: '0', panelId: '3'},
+        {stripId: '0', panelId: '7'},
+        {stripId: '2', panelId: '6'}
       ],
       NUM_ACTIVE_PANELS: {
         10: 1, // At panelCount of 10, increase # of simultaneusly active panels
@@ -72,6 +72,7 @@ export default class DefaultConfig {
         {count: 20, range: [2, 3]},
         {count: 30, range: [1.5, 2]}
       ],
+      PANEL_SUCCESS_DELAY: 1000,
       // The intensity to use on the active panels
       ACTIVE_PANEL_INTENSITY: 100,
       // The intensity to use on the active panels
