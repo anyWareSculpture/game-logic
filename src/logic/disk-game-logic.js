@@ -50,7 +50,6 @@ export default class DiskGameLogic {
         this._lights.setIntensity(stripId, panelId, this.gameConfig.AVAILABLE_PANEL_INTENSITY);
       }
     }
-
   }
 
   end() {
