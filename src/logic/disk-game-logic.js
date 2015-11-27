@@ -54,9 +54,14 @@ export default class DiskGameLogic {
   }
 
   end() {
-    let lights = this.store.data.get('lights');
-    lights.deactivateAll();
-    this.config.LIGHTS.GAME_STRIPS.forEach((id) => lights.setIntensity(id, null, 0));
+    this.config.LIGHTS.GAME_STRIPS.forEach((id) => this._lights.setIntensity(id, null, 0));
+    // Deactivate shadow lights
+    for (let stripId of Object.keys(this.gameConfig.SHADOW_LIGHTS)) {
+      const panels = this.gameConfig.SHADOW_LIGHTS[stripId];
+      for (let panelId of Object.keys(panels)) {
+        this._lights.setIntensity(stripId, panelId, 0);
+      }
+    }
   }
 
   handleActionPayload(payload) {
