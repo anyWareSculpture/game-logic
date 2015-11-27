@@ -88,25 +88,38 @@ export default class DefaultConfig {
       // The user will wins when they reach these positions for each diskId.
       RELATIVE_TOLERANCE: 3, // degrees tolerance for disks relative to each other
       ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
-      TARGET_POSITIONS_LEVELS: [
+      // The intensity of the panels that the user can use to play the sequence
+      AVAILABLE_PANEL_INTENSITY: 20,
+      ACTIVE_PERIMETER_INTENSITY: 100,
+      INACTIVE_PERIMETER_INTENSITY: 50,
+      PERIMETER_COLOR: "white",
+      SHADOW_LIGHTS: {
+        // stripId: [panelId..]
+        '6': ['0', '1', '2']
+      },
+      SHADOW_LIGHT_INTENSITY: 100,
+      LEVELS: [
         // level 0
-        {
-          // diskId: target position
-          disk0: 90,
-          disk1: 180,
-          disk2: 270
+        // disks: { diskId: target position }
+        // perimeter: { stripId: [panelIds..] }
+        { disks:     { disk2: 63, disk1: 111, disk0: 333 },
+          perimeter: { '3': ['0', '2']  }
         },
-        {
-          disk0: 45,
-          disk1: 225,
-          disk2: 90
+        // level 1
+        { disks:     { disk2: 331,  disk1: 25, disk0: 51 },
+          perimeter: { '3': ['1', '4']  }
         },
-        {
-          disk0: 120,
-          disk1: 70,
-          disk2: 100
+        // level 2
+        { disks:     { disk2: 0, disk1: 77,  disk0: 314 },
+          perimeter: { '3': ['3', '5']  }
         }
       ],
+      LIGHT_MAPPING: {
+        // diskId: { stripId: panelId }
+        disk0: { '4': '0' },
+        disk1: { '4': '1' },
+        disk2: { '4': '2' }
+      },
       CONTROL_MAPPINGS: {
         // stripId
         '0': {
