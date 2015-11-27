@@ -43,8 +43,7 @@ export default class MoleGameLogic {
     this._complete = false;
     this.data.set('panelCount', 0);
     this.data.set('panels', new TrackedPanels);
-    const {panel, lifetime} = this._nextActivePanel(0);
-    this._activatePanel(panel);
+    this._registerTimeout(0);
   }
 
   end() {
@@ -150,9 +149,9 @@ export default class MoleGameLogic {
   _nextActivePanel(count) {
     if (count < this.gameConfig.INITIAL_PANELS.length) {
       const panel = this.gameConfig.INITIAL_PANELS[count];
-      return { panel, lifetime: 0 }; // No timeout
+      return { panel, lifetime: this._getPanelLifetime(count) }; // No timeout
     }
-    return { panel: this._getRandomPanel(count), lifetime: this._getRandomLifetime(count)};
+    return { panel: this._getRandomPanel(count), lifetime: this._getPanelLifetime(count)};
   }
 
   _getRandomPanel(count) {
@@ -163,7 +162,7 @@ export default class MoleGameLogic {
     return curr.value;
   }
 
-  _getRandomLifetime(count) {
+  _getPanelLifetime(count) {
     // find last and next lifetime values for interpolation
     let last, next;
     for (let elem of this.gameConfig.PANEL_LIFETIME) {
@@ -207,10 +206,8 @@ export default class MoleGameLogic {
    * Call with panel to turn off the panel after the given timeout
    */
   _registerTimeout(timeout, panel = null) {
-    if (timeout > 0) {
-      const tid = setTimeout(this._panelTimeout.bind(this, panel), timeout);
-      if (panel) this._activeTimeouts[this._getPanelKey(panel)] = tid;
-    }
+    const tid = setTimeout(this._panelTimeout.bind(this, panel), timeout);
+    if (panel) this._activeTimeouts[this._getPanelKey(panel)] = tid;
   }
 
   // FIXME: The panel should also pulse. Should the pulsating state be part of tracked data, or should each view deduce this from the current game and state?

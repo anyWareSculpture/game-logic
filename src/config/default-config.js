@@ -82,6 +82,7 @@ export default class DefaultConfig {
         27: -1
       },
       PANEL_LIFETIME: [
+        {count: 0, range: [5, 5]}, // Initial timeout
         {count: 4, range: [4, 6]}, // At panelCount of 4, set panel lifetime to 4-6 seconds. Gradually interpolate to next timeout level
         {count: 20, range: [2, 3]},
         {count: 30, range: [1.5, 2]}
