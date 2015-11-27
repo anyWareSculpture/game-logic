@@ -81,23 +81,26 @@ export default class DefaultConfig {
       ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
       TARGET_POSITIONS_LEVELS: [
         // level 0
-        {
-          // diskId: target position
-          disk0: 90,
-          disk1: 180,
-          disk2: 270
+        // disks: { diskId: target position }
+        // perimeter: { stripId: [panelIds..] }
+        { disks:     { disk2: 63, disk1: 111, disk0: 333 },
+          perimeter: { this.LIGHTS.PERIMETER: ['0', '2']  }
         },
-        {
-          disk0: 45,
-          disk1: 225,
-          disk2: 90
+        // level 1
+        { disks:     { disk2: 331,  disk1: 25, disk0: 51 },
+          perimeter: { this.LIGHTS.PERIMETER: ['1', '4']  }
         },
-        {
-          disk0: 120,
-          disk1: 70,
-          disk2: 100
+        // level 2
+        { disks:     { disk2: 0, disk1: 77,  disk0: 314 },
+          perimeter: { this.LIGHTS.PERIMETER: ['3', '5']  }
         }
       ],
+      LIGHT_MAPPING: {
+        // diskId: { stripId: panelId }
+        disk0: { this.LIGHTS.DISK_LIGHT_STRIP: '0' },
+        disk1: { this.LIGHTS.DISK_LIGHT_STRIP: '1' },
+        disk2: { this.LIGHTS.DISK_LIGHT_STRIP: '2' }
+      },
       CONTROL_MAPPINGS: {
         // stripId
         '0': {
