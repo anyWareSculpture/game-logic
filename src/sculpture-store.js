@@ -24,6 +24,9 @@ export default class SculptureStore extends events.EventEmitter {
   constructor(dispatcher, config) {
     super();
 
+    this.dispatcher = dispatcher;
+    this.config = config;
+
     this.data = new TrackedData({
       status: SculptureStore.STATUS_READY,
       panelAnimation: null,
@@ -31,13 +34,13 @@ export default class SculptureStore extends events.EventEmitter {
       handshakes: new TrackedSet(),
       lights: new LightArray({
         // stripId : number of panels
-        '0': 10,
-        '1': 10,
-        '2': 10,
-        '3': 6, // Perimeter lights
-        '4': 3, // Disk lights
-        '5': 4, // Handshake lights
-        '6': 3  // High-power lights
+        [this.config.LIGHTS.STRIP_A]: 10,
+        [this.config.LIGHTS.STRIP_B]: 10,
+        [this.config.LIGHTS.STRIP_C]: 10,
+        [this.config.LIGHTS.PERIMETER_STRIP]: 6,
+        [this.config.LIGHTS.DISK_LIGHT_STRIP]: 3,
+        [this.config.LIGHTS.HANDSHAKE_STRIP]: 4,
+        [this.config.LIGHTS.ENVIRONMENT_STRIP]: 3
       }),
       disks: new TrackedData({
         disk0: new Disk(),
@@ -50,9 +53,7 @@ export default class SculptureStore extends events.EventEmitter {
       simon: new TrackedData(SimonGameLogic.trackedProperties)
     });
 
-    this.config = config;
     this.currentGameLogic = null;
-    this.dispatcher = dispatcher;
     this.dispatchToken = this._registerDispatcher(this.dispatcher);
     this.sculptureActionCreator = new SculptureActionCreator(this.dispatcher);
   }

@@ -50,12 +50,19 @@ export default class DefaultConfig {
 
     /******* LIGHTS ********************/
     this.LIGHTS = {
-      GAME_STRIPS: ['0','1','2'],
+      STRIP_A: '0',
+      STRIP_B: '1',
+      STRIP_C: '2',
       PERIMETER_STRIP: '3',
       DISK_LIGHT_STRIP: '4'
       HANDSHAKE_STRIP: '5',
-      ENVIRONMENT_STRIP: '6'
+      ART_LIGHTS_STRIP: '6'
     }
+    this.LIGHTS.GAME_STRIPS = [
+      this.LIGHTS.STRIP_A,
+      this.LIGHTS.STRIP_B,
+      this.LIGHTS.STRIP_C,
+    ];
 
     /******* GAMES CONFIGURATION *******/
 
@@ -65,9 +72,9 @@ export default class DefaultConfig {
         // When every panel in the group has been pressed, the next group will turn on
         // After the last group the game will end
         // [[stripId, panelId], ...],
-        [['0', '3'], ['1', '3'], ['2', '3']],
-        [['0', '4'], ['1', '5']],
-        [['0', '3'], ['0', '5'], ['2', '4']]
+        [[this.LIGHTS.STRIP_A, '3'], ['1', '3'], ['2', '3']],
+        [[this.LIGHTS.STRIP_A, '4'], ['1', '5']],
+        [[this.LIGHTS.STRIP_A, '3'], [this.LIGHTS.STRIP_A, '5'], ['2', '4']]
       ],
       // The intensity to use on the lit up panels
       TARGET_PANEL_INTENSITY: 100,
@@ -99,7 +106,7 @@ export default class DefaultConfig {
       ],
       CONTROL_MAPPINGS: {
         // stripId
-        '0': {
+        this.LIGHTS.STRIP_A: {
           // panelId
           '3': {
             // diskId
@@ -112,7 +119,7 @@ export default class DefaultConfig {
             disk2: Disk.CLOCKWISE
           }
         },
-        '2': {
+        this.LIGHTS.STRIP_C: {
           // panelId
           '3': {
             // diskId
@@ -132,19 +139,19 @@ export default class DefaultConfig {
       PATTERN_LEVELS: [
         // level 0 sequence
         {
-          stripId: '0',
+          stripId: this.LIGHTS.STRIP_A,
           // Each array of panel IDs is lit up one at a time
           // Each array within this array is called a "frame" in the "sequence"
           panelSequence: [['3'], ['4'], ['5']]
         },
         // level 1 sequence
         {
-          stripId: '1',
+          stripId: this.LIGHTS.STRIP_B,
           panelSequence: [['3'], ['5'], ['4']]
         },
         // level 2 sequence
         {
-          stripId: '2',
+          stripId: this.LIGHTS.STRIP_C,
           panelSequence: [['3'], ['5'], ['4'], ['6']]
         }
       ],
