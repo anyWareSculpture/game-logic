@@ -33,7 +33,11 @@ export default class SculptureStore extends events.EventEmitter {
         // stripId : number of panels
         '0': 10,
         '1': 10,
-        '2': 10
+        '2': 10,
+        '3': 6, // Perimeter lights
+        '4': 3, // Disk lights
+        '5': 4, // Handshake lights
+        '6': 3  // High-power lights
       }),
       disks: new TrackedData({
         disk0: new Disk(),
