@@ -24,9 +24,33 @@ export default class DiskGameLogic {
     return this.store.data.get('disk');
   }
 
+  get _lights() {
+    return this.store.data.get('lights');
+  }
+
   start() {
     this._level = DEFAULT_LEVEL;
     this._complete = false;
+
+    // Activate shadow lights
+    for (let stripId of Object.keys(this.gameConfig.SHADOW_LIGHTS)) {
+      const panels = this.gameConfig.SHADOW_LIGHTS[stripId];
+      for (let panelId of Object.keys(panels)) {
+        this._lights.setIntensity(stripId, panelId, this.gameConfig.SHADOW_LIGHT_INTENSITY);
+      }
+    }
+
+    // Indicate start of new level by setting perimeter lights
+    this._setPerimeter(this._level, this.gameConfig.PERIMETER_COLOR, this.gameConfig.ACTIVE_PERIMETER_INTENSITY)
+
+    // Activate UI indicators
+    for (let stripId of Object.keys(this.gameConfig.CONTROL_MAPPINGS)) {
+      const panels = this.gameConfig.CONTROL_MAPPINGS[stripId];
+      for (let panelId of Object.keys(panels)) {
+        this._lights.setIntensity(stripId, panelId, this.gameConfig.AVAILABLE_PANEL_INTENSITY);
+      }
+    }
+
   }
 
   end() {
@@ -88,6 +112,17 @@ export default class DiskGameLogic {
     }
 
     if (!this.store.isStatusSuccess) {
+      // FIXME:
+      // Instead of just checking for the win condition, we want to:
+      // o If Disk 0 or Disk 2 (the disks with the boundary part of the pattern) is in the 
+      //   correct location for a minimum amount of time, we trigger the Single Disk Success event
+
+      // Single Disk Success Event
+      // o Play success sounds (AudioView)
+      // o UI LEDS and disk LED turns location color
+      // o If Disk 1 or 2, turn perimeter LED to location color
+      // o Lock this disk in position; disable any future interaction
+      // o From now on, allow Disk 1 to trigger a Single Disk Success Event
       this._checkWinConditions(disks);
     }
   }
@@ -98,15 +133,52 @@ export default class DiskGameLogic {
     }
   }
 
+  /**
+   * Win conditions:
+   * o The three disks needs to be _relatively_ aligned within RELATIVE_TOLERANCE
+   * o Any disk must be aligned within ABSOLUTE_TOLERANCE
+   */
   _checkWinConditions(disks) {
+    let prevDiskId = null;
     for (let diskId of Object.keys(this._targetPositions)) {
-      const targetPosition = this._targetPositions[diskId];
-      if (Math.abs(disks.get(diskId).getPosition() - targetPosition) > this.gameConfig.TOLERANCE) {
+      const targetPos = this._targetPositions[diskId];
+      const currDisk = disks.get(diskId);
+      const diskPos = currDisk.getPosition();
+
+      // Check position relative to neighbor disk
+      if (prevDiskId) {
+        if (Math.abs((targetPos - this._targetPositions[prevDiskId]) -
+                     (diskPos - disks.get(prevDiskId).getPosition())) > 
+                     this.gameConfig.RELATIVE_TOLERANCE) {
+          return false;
+        }
+      }
+      // Check absolute position
+      if (Math.abs(diskPos - targetPos) > this.gameConfig.ABSOLUTE_TOLERANCE) {
         return false;
       }
+      prevDiskId = diskId;
     }
 
     this._winGame();
+  }
+
+  /**
+   * Current score (the total number of degrees away from solution).
+   * For 3 disks, this will be between 0 and 540
+   */
+  getScore(disks) {
+    // We cannot calculate the score of a complete game as we don't have a valid level
+    if (this._complete) return 0;
+
+    let distance = 0;
+    for (let diskId of Object.keys(this._targetPositions)) {
+      let delta = this._targetPositions[diskId] - disks.get(diskId).getPosition();
+      while (delta <= -180) delta += 360;
+      while (delta > 180) delta -= 360;      
+      distance += Math.abs(delta);
+    }
+    return distance;
   }
 
   _winGame() {
@@ -115,12 +187,33 @@ export default class DiskGameLogic {
 
     this.store.setSuccessStatus();
 
+    // Indicate end of level by setting perimeter lights
+    this._setPerimeter(this._level, this.store.userColor, this.gameConfig.INACTIVE_PERIMETER_INTENSITY)
+
     let level = this._level + 1;
     if (level >= this._levels) {
       this._complete = true;
     }
 
     this._level = level;
+
+    // Indicate start of new level by setting perimeter lights
+    if (!this._complete) {
+      this._setPerimeter(level, this.gameConfig.PERIMETER_COLOR, this.gameConfig.ACTIVE_PERIMETER_INTENSITY)
+    }
+}
+
+  /**
+   * Set perimeter lights for the given level to the given color and intensity
+   */
+  _setPerimeter(level, color, intensity) {
+    const perimeter = this.gameConfig.LEVELS[level].perimeter;
+    for (let stripId of Object.keys(perimeter)) {
+      for (let panelId of perimeter[stripId]) {
+        this._lights.setColor(stripId, panelId, color);
+        this._lights.setIntensity(stripId, panelId, intensity);
+      }
+    }
   }
 
   _stopAllDisks() {
@@ -133,11 +226,11 @@ export default class DiskGameLogic {
 
   get _targetPositions() {
     const level = this._level;
-    return this.gameConfig.TARGET_POSITIONS_LEVELS[level];
+    return this.gameConfig.LEVELS[level].disks;
   }
 
   get _levels() {
-    return this.gameConfig.TARGET_POSITIONS_LEVELS.length;
+    return this.gameConfig.LEVELS.length;
   }
 
   get _level() {

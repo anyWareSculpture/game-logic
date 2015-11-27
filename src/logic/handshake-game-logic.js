@@ -8,8 +8,11 @@ export default class HandshakeGameLogic {
   constructor(store, config) {
     this.store = store;
     this.config = config;
+    this.gameConfig = config.HANDSHAKE_GAME;
 
     this._complete = false;
+
+    this.sculptureActionCreator = new SculptureActionCreator(this.store.dispatcher);
   }
 
   get data() {
@@ -39,14 +42,10 @@ export default class HandshakeGameLogic {
   }
 
   _actionHandshakeActivate(payload) {
+    this._complete = true;
+    // Only the receiving sculpture will manage the transition
     if (payload.user === this.store.username) {
-      this._finish();
+      setTimeout(() => this.sculptureActionCreator.sendStartNextGame(), this.gameConfig.TRANSITION_OUT_TIME);
     }
   }
-
-  _finish() {
-    this._complete = true;
-    this.store.moveToNextGame();
-  }
 }
-

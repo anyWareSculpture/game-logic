@@ -18,6 +18,7 @@ export default class SimonGameLogic {
     this.gameConfig = this.config.SIMON_GAME;
 
     this.simonGameActionCreator = new SimonGameActionCreator(this.store.dispatcher);
+    this.sculptureActionCreator = new SculptureActionCreator(this.store.dispatcher);
 
     this._targetSequenceIndex = 0;
     this._targetSequence = null;
@@ -67,7 +68,7 @@ export default class SimonGameLogic {
 
   _actionFinishStatusAnimation(payload) {
     if (this._complete) {
-      this.store.moveToNextGame();
+      setTimeout(() => this.sculptureActionCreator.sendStartNextGame(), this.gameConfig.TRANSITION_OUT_TIME);
     }
     else {
       this._playCurrentSequence();

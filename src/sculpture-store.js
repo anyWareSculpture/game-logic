@@ -178,9 +178,7 @@ export default class SculptureStore extends events.EventEmitter {
    * Starts the next game in the game sequence
    */
   moveToNextGame() {
-    const nextGame = this._getNextGame();
-
-    this._startGame(nextGame);
+    this._startGame(this._getNextGame());
   }
 
   _startGame(game) {
@@ -243,6 +241,7 @@ export default class SculptureStore extends events.EventEmitter {
   _delegateAction(payload) {
     const actionHandlers = {
       [SculptureActionCreator.START_GAME]: this._actionStartGame.bind(this),
+      [SculptureActionCreator.START_NEXT_GAME]: this._actionStartNextGame.bind(this),
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
@@ -266,6 +265,10 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     this._startGame(game);
+  }
+
+  _actionStartNextGame() {
+    this.moveToNextGame();
   }
 
   _actionMergeState(payload) {

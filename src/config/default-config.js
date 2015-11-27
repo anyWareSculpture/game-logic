@@ -54,7 +54,7 @@ export default class DefaultConfig {
       STRIP_B: '1',
       STRIP_C: '2',
       PERIMETER_STRIP: '3',
-      DISK_LIGHT_STRIP: '4'
+      DISK_LIGHT_STRIP: '4',
       HANDSHAKE_STRIP: '5',
       ART_LIGHTS_STRIP: '6'
     }
@@ -66,71 +66,90 @@ export default class DefaultConfig {
 
     /******* GAMES CONFIGURATION *******/
 
+    this.HANDSHAKE_GAME = {
+      TRANSITION_OUT_TIME: 4000
+    },
     this.MOLE_GAME = {
-      TARGET_PANEL_GROUPS: [
-        // Each group will be lit up one at a time
-        // When every panel in the group has been pressed, the next group will turn on
-        // After the last group the game will end
-        // [[stripId, panelId], ...],
-        [[this.LIGHTS.STRIP_A, '3'], ['1', '3'], ['2', '3']],
-        [[this.LIGHTS.STRIP_A, '4'], ['1', '5']],
-        [[this.LIGHTS.STRIP_A, '3'], [this.LIGHTS.STRIP_A, '5'], ['2', '4']]
+      INITIAL_PANELS: [
+        {stripId: this.LIGHTS.STRIP_A, panelId: '3'},
+        {stripId: this.LIGHTS.STRIP_A, panelId: '7'},
+        {stripId: this.LIGHTS.STRIP_C, panelId: '6'}
       ],
-      // The intensity to use on the lit up panels
-      TARGET_PANEL_INTENSITY: 100,
-      // The intensity to use once a panel has been pressed
-      PANEL_OFF_INTENSITY: 0
+      NUM_ACTIVE_PANELS: {
+        10: 1, // At panelCount of 10, increase # of simultaneusly active panels
+        20: 1,
+        25: -1, // At panelCount of 25, decrease # of simultaneusly active panels
+        27: -1
+      },
+      PANEL_LIFETIME: [
+        {count: 4, range: [4, 6]}, // At panelCount of 4, set panel lifetime to 4-6 seconds. Gradually interpolate to next timeout level
+        {count: 20, range: [2, 3]},
+        {count: 30, range: [1.5, 2]}
+      ],
+      PANEL_SUCCESS_DELAY: 1000,
+      // The intensity to use on the active panels
+      ACTIVE_PANEL_INTENSITY: 100,
+      // The intensity to use on the active panels
+      INACTIVE_PANEL_INTENSITY: 0,
+      // The intensity to use on the inactive panels (panels turned to location color)
+      COLORED_PANEL_INTENSITY: 75
     };
 
     this.DISK_GAME = {
-      // The user will wins when they reach these positions for each diskId, within the given tolerance
-      TOLERANCE: 3, // degrees
-      TARGET_POSITIONS_LEVELS: [
+      // The user will wins when they reach these positions for each diskId.
+      RELATIVE_TOLERANCE: 3, // degrees tolerance for disks relative to each other
+      ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
+      // The intensity of the panels that the user can use to play the sequence
+      AVAILABLE_PANEL_INTENSITY: 20,
+      ACTIVE_PERIMETER_INTENSITY: 100,
+      INACTIVE_PERIMETER_INTENSITY: 50,
+      PERIMETER_COLOR: "white",
+      SHADOW_LIGHTS: {
+        // stripId: [panelId..]
+        '6': ['0', '1', '2']
+      },
+      SHADOW_LIGHT_INTENSITY: 100,
+      LEVELS: [
         // level 0
-        {
-          // diskId: target position
-          disk0: 90,
-          disk1: 180,
-          disk2: 270
+        // disks: { diskId: target position }
+        // perimeter: { stripId: [panelIds..] }
+        { disks:     { disk2: 63, disk1: 111, disk0: 333 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2']  }
         },
-        {
-          disk0: 45,
-          disk1: 225,
-          disk2: 90
+        // level 1
+        { disks:     { disk2: 331,  disk1: 25, disk0: 51 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4']  }
         },
-        {
-          disk0: 120,
-          disk1: 70,
-          disk2: 100
+        // level 2
+        { disks:     { disk2: 0, disk1: 77,  disk0: 314 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5']  }
         }
       ],
+      LIGHT_MAPPING: {
+        // diskId: { stripId: panelId }
+        disk0: { [this.LIGHTS.DISK_LIGHT_STRIP]: '0' },
+        disk1: { [this.LIGHTS.DISK_LIGHT_STRIP]: '1' },
+        disk2: { [this.LIGHTS.DISK_LIGHT_STRIP]: '2' }
+      },
       CONTROL_MAPPINGS: {
         // stripId
-        this.LIGHTS.STRIP_A: {
-          // panelId
-          '3': {
-            // diskId
-            disk0: Disk.CLOCKWISE
-          },
-          '4': {
-            disk1: Disk.CLOCKWISE
-          },
-          '5': {
-            disk2: Disk.CLOCKWISE
-          }
+        [this.LIGHTS.STRIP_A]: {
+          // panelId -- diskId
+          '1': { disk0: Disk.COUNTERCLOCKWISE },
+          '2': { disk0: Disk.COUNTERCLOCKWISE },
+          '4': { disk1: Disk.COUNTERCLOCKWISE },
+          '5': { disk1: Disk.COUNTERCLOCKWISE },
+          '7': { disk2: Disk.COUNTERCLOCKWISE },
+          '8': { disk2: Disk.COUNTERCLOCKWISE }
         },
-        this.LIGHTS.STRIP_C: {
-          // panelId
-          '3': {
-            // diskId
-            disk0: Disk.COUNTERCLOCKWISE
-          },
-          '4': {
-            disk1: Disk.COUNTERCLOCKWISE
-          },
-          '5': {
-            disk2: Disk.COUNTERCLOCKWISE
-          }
+        [this.LIGHTS.STRIP_C]: {
+          // panelId -- diskId
+          '1': { disk0: Disk.CLOCKWISE },
+          '2': { disk0: Disk.CLOCKWISE },
+          '4': { disk1: Disk.CLOCKWISE },
+          '5': { disk1: Disk.CLOCKWISE },
+          '7': { disk2: Disk.CLOCKWISE },
+          '8': { disk2: Disk.CLOCKWISE }
         }
       }
     };
@@ -167,7 +186,9 @@ export default class DefaultConfig {
       // The time after input to wait for the user to finish the sequence
       INPUT_TIMEOUT: 10000,
       // The default color to set the panels to when
-      DEFAULT_SIMON_PANEL_COLOR: "white"
+      DEFAULT_SIMON_PANEL_COLOR: "white",
+      // Wait while playing final sound
+      TRANSITION_OUT_TIME: 10000
     };
   }
 
