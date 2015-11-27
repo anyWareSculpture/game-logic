@@ -46,6 +46,12 @@ export default class MoleGameLogic {
     this._activatePanel(panel);
   }
 
+  end() {
+    let lights = this.store.data.get('lights');
+    lights.deactivateAll();
+    this.config.LIGHTS.GAME_STRIPS.forEach((id) => this._disablePanel(id));
+  }
+
   /**
    * handleActionPayload must _synchronously_ change tracked data in sculpture store.
    * Any asynchronous behavior must happen by dispatching actions.
