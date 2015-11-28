@@ -178,7 +178,7 @@ export default class DefaultConfig {
       // The intensity of the panels when they are pressed or when the sequence is playing
       TARGET_PANEL_INTENSITY: 100,
       // The intensity of the panels that the user can use to play the sequence
-      AVAILABLE_PANEL_INTENSITY: 20,
+      AVAILABLE_PANEL_INTENSITY: 1,
       // The delay in ms between sequence frames
       SEQUENCE_ANIMATION_FRAME_DELAY: 500,
       // The delay in ms to wait before replaying the sequence
