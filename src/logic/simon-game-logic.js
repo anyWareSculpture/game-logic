@@ -76,7 +76,7 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    if (this._complete || !this.isReadyAndNotAnimating) {
+    if (this._complete || !this.store.isReady) {
       return;
     }
 
