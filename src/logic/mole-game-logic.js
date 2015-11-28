@@ -177,8 +177,8 @@ export default class MoleGameLogic {
       max = last.range[1];
     }
     else {
-      min = last.range[0] + (next.range[0] - last.range[0]) * (count - last.range[0]) / (next.count - last.count);
-      max = last.range[1] + (next.range[1] - last.range[1]) * (count - last.range[1]) / (next.count - last.count);
+      min = last.range[0] + (next.range[0] - last.range[0]) * (count - last.count) / (next.count - last.count);
+      max = last.range[1] + (next.range[1] - last.range[1]) * (count - last.count) / (next.count - last.count);
     }
     return 1000 * (Math.random() * (max - min) + min);
   }
