@@ -197,10 +197,19 @@ export default class SculptureStore extends events.EventEmitter {
     if (this.currentGameLogic) {
       this.currentGameLogic.end();
     }
+    this._resetGamePanels();
 
     this.data.set('currentGame', game);
     this.currentGameLogic = new GameLogic(this, this.config);
     this.currentGameLogic.start();
+  }
+
+  _resetGamePanels() {
+    const lightArray = this.data.get('lights');
+    this.config.LIGHTS.GAME_STRIPS.forEach((stripId) => {
+      lightArray.setDefaultColor(stripId);
+      lightArray.setDefaultIntensity(stripId);
+    });
   }
 
   _publishChanges() {
