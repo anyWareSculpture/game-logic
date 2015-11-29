@@ -115,7 +115,7 @@ export default class MoleGameLogic {
 
       // Advance game
       let panelCount = this.data.get("panelCount") + 1;
-      if (panelCount == 30) {
+      if (panelCount == 29) { // FIXME: Make game end configurable
         this._winGame();
       }
       else {
