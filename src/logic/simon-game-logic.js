@@ -47,6 +47,10 @@ export default class SimonGameLogic {
     this.config.LIGHTS.GAME_STRIPS.forEach((id) => lights.setIntensity(id, null, 0));
   }
 
+  get complete() {
+    return this._complete;
+  }
+
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
