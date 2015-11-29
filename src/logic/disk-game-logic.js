@@ -147,9 +147,6 @@ export default class DiskGameLogic {
     if (disk.isConflicting) {
       this._setDiskControlsColor(diskId, this.config.COLORS.ERROR);
     }
-    else {
-      this._setDiskControlsColor(diskId, this.store.userColor);
-    }
   }
 
   _actionDiskUpdate(payload) {

@@ -101,16 +101,29 @@ export default class MoleGameLogic {
    */
   _actionPanelPressed(payload) {
     let {stripId, panelId, pressed} = payload;
-    const key = this._getPanelKey(payload);
+
+    const state = this.data.get('panels').getPanelState(stripId, panelId);
+    if (!state || state === TrackedPanels.STATE_OFF) {
+      if (pressed) {
+        this._lights.setColor(stripId, panelId, this.userColor);
+        this._lights.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.ACTIVE_INTENSITY);
+      }
+      else {
+        this._lights.setDefaultColor(stripId, panelId);
+        this._lights.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.INACTIVE_INTENSITY);
+      }
+      return;
+    }
 
     // If we have a timeout on this panel, kill the timeout
+    const key = this._getPanelKey(payload);
     if (this._activeTimeouts.hasOwnProperty(key)) {
       clearTimeout(this._activeTimeouts[key]);
       delete this._activeTimeouts[key];
     }
 
     // If an active panel was touched
-    if (this.data.get('panels').getPanelState(stripId, panelId) === TrackedPanels.STATE_ON) {
+    if (state === TrackedPanels.STATE_ON) {
       this._colorPanel({stripId, panelId});
 
       // Advance game
