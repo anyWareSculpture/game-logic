@@ -68,6 +68,11 @@ export default class DiskGameLogic {
         this._lights.setIntensity(stripId, panelId, 0);
       }
     }
+    // Deactivate perimeter lights (FIXME: This should be part of the end animation)
+    for (let panelId of ['0','1','2','3','4','5']) {
+      this._lights.setIntensity(this.config.LIGHTS.PERIMETER_STRIP, panelId, 0);
+      this._lights.setDefaultColor(this.config.LIGHTS.PERIMETER_STRIP, panelId);
+    }
   }
 
   handleActionPayload(payload) {
