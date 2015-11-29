@@ -255,7 +255,17 @@ export default class DiskGameLogic {
     this._winGame();
   }
 
-  //TODO: move this public method up
+  //TODO: move these public methods up
+  getDiskScore(diskId) {
+    // We cannot calculate the score of a complete game as we don't have a valid level
+    if (this._complete) return 0;
+
+    const disks = this.store.data.get('disks');
+    let delta = this._targetPositions[diskId] - disks.get(diskId).getPosition();
+    while (delta <= -180) delta += 360;
+    while (delta > 180) delta -= 360;
+    return Math.abs(delta);
+  }
   /**
    * Current score (the total number of degrees away from solution).
    * For 3 disks, this will be between 0 and 540
@@ -266,10 +276,7 @@ export default class DiskGameLogic {
 
     let distance = 0;
     for (let diskId of Object.keys(this._targetPositions)) {
-      let delta = this._targetPositions[diskId] - disks.get(diskId).getPosition();
-      while (delta <= -180) delta += 360;
-      while (delta > 180) delta -= 360;      
-      distance += Math.abs(delta);
+      distance += this.getDiskScore(diskId);
     }
     return distance;
   }
