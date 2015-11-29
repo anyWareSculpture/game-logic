@@ -13,9 +13,6 @@ export default class Disk extends TrackedData {
     super({
       position: position,
       direction: direction,
-      // The "pull" to move in either direction
-      clockwisePull: 0,
-      counterclockwisePull: 0,
       user: "",
       state: Disk.STATE_READY
     });
@@ -34,20 +31,17 @@ export default class Disk extends TrackedData {
    * @param {String} direction - Static direction constant from Disk
    */
   setDirection(direction) {
-    if (direction === Disk.STOPPED) {
-      this.set("clockwisePull", 0);
-      this.set("counterclockwisePull", 0);
+    const currentDirection = this.getDirection();
+    if (Disk.conflictsWith(currentDirection, direction)) {
+      this.setDirectionConflict();
     }
-    else if (direction === Disk.CLOCKWISE) {
-      this.set("clockwisePull", this.clockwisePull + 1);
-    }
-    else if (direction === Disk.COUNTERCLOCKWISE) {
-      this.set("counterclockwisePull", this.counterclockwisePull + 1);
+    else if (direction !== Disk.STOPPED && currentDirection === Disk.CONFLICT) {
+      // No other direction can be set while conflicting except for stop
+      return;
     }
     else {
-      throw new Error(`Could not resolve how to set direction ${direction}`);
+      this.set('direction', direction);
     }
-    this.resolveDirection();
   }
 
   /**
@@ -58,16 +52,17 @@ export default class Disk extends TrackedData {
    *    CLOCKWISE and COUNTERCLOCKWISE directions
    */
   unsetDirection(direction) {
-    if (direction === Disk.CLOCKWISE) {
-      this.set("clockwisePull", this.clockwisePull - 1);
+    const currentDirection = this.getDirection();
+    if (currentDirection === direction) {
+      this.stop();
     }
-    else if (direction === Disk.COUNTERCLOCKWISE) {
-      this.set("counterclockwisePull", this.counterclockwisePull - 1);
+    else if (currentDirection === Disk.CONFLICT) {
+      const opposite = Disk.oppositeDirection(direction);
+      this.set('direction', opposite);
     }
     else {
       throw new Error(`Could not reason about how to unset direction '${direction}' from current direction '${currentDirection}'`);
     }
-    this.resolveDirection();
   }
 
   turnClockwise() {
@@ -82,27 +77,8 @@ export default class Disk extends TrackedData {
     this.setDirection(Disk.STOPPED);
   }
 
-  resolveDirection() {
-    const clockwisePull = this.clockwisePull;
-    const counterclockwisePull = this.counterclockwisePull;
-
-    let direction;
-    if (clockwisePull === 0 && counterclockwisePull === 0) {
-      direction = Disk.STOPPED;
-    }
-    else if (clockwisePull === counterclockwisePull) {
-      direction = Disk.CONFLICT;
-    }
-    else if (clockwisePull > counterclockwisePull) {
-      direction = Disk.CLOCKWISE;
-    }
-    else if (clockwisePull < counterclockwisePull) {
-      direction = Disk.COUNTERCLOCKWISE;
-    }
-    else {
-      throw new Error("Should never reach this case...");
-    }
-    this.set('direction', direction);
+  setDirectionConflict() {
+    this.setDirection(Disk.CONFLICT);
   }
 
   get isStopped() {
@@ -119,14 +95,6 @@ export default class Disk extends TrackedData {
 
   get isTurningCounterclockwise() {
     return this.getDirection() === Disk.COUNTERCLOCKWISE;
-  }
-
-  get counterclockwisePull() {
-    return this.get('counterclockwisePull');
-  }
-
-  get clockwisePull() {
-    return this.get('clockwisePull');
   }
 
   getDirection() {

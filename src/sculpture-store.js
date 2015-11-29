@@ -104,7 +104,7 @@ export default class SculptureStore extends events.EventEmitter {
    * 
    */
   get userColor() {
-    return this.config.USER_COLORS[this.config.username];
+    return this.config.getUserColor(this.config.username);
   }
 
   /**
@@ -327,8 +327,19 @@ export default class SculptureStore extends events.EventEmitter {
       return;
     }
 
+    const lightArray = this.data.get('lights');
     const {stripId, panelId, pressed} = payload;
-    this.data.get('lights').activate(stripId, panelId, pressed);
+    lightArray.activate(stripId, panelId, pressed);
+    // This is a reasonable default behaviour that can be overridden in
+    // a game logic class if necessary
+    if (pressed) {
+      lightArray.setColor(stripId, panelId, this.userColor);
+      lightArray.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.ACTIVE_INTENSITY);
+    }
+    else {
+      lightArray.setDefaultColor(stripId, panelId);
+      lightArray.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.INACTIVE_INTENSITY);
+    }
   }
 
   _actionDiskUpdate(payload) {

@@ -33,11 +33,14 @@ export default class DefaultConfig {
     this.username = username || user0;
 
     // A mapping between usernames and the colors that represent them
-    this.USER_COLORS = {
-      // username : color
-      [this.user0]: COLORS.USER0,
-      [this.user1]: COLORS.USER1,
-      [this.user2]: COLORS.USER2
+    this.COLORS = {
+      USERS: {
+        // username : color
+        [this.user0]: COLORS.USER0,
+        [this.user1]: COLORS.USER1,
+        [this.user2]: COLORS.USER2
+      },
+      ERROR: 'error'
     };
 
     // The sequence of the games to be run. The first game is run on startup
@@ -63,6 +66,13 @@ export default class DefaultConfig {
       this.LIGHTS.STRIP_B,
       this.LIGHTS.STRIP_C,
     ];
+
+    // These settings effect the default behaviour of panels outside of
+    // any custom logic in any of the games
+    this.PANEL_DEFAULTS = {
+      ACTIVE_INTENSITY: 100,
+      INACTIVE_INTENSITY: 0
+    };
 
     /******* GAMES CONFIGURATION *******/
 
@@ -102,7 +112,8 @@ export default class DefaultConfig {
       RELATIVE_TOLERANCE: 3, // degrees tolerance for disks relative to each other
       ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
       // The intensity of the panels that the user can use to play the sequence
-      AVAILABLE_PANEL_INTENSITY: 20,
+      CONTROL_PANEL_INTENSITY: 20,
+      ACTIVE_CONTROL_PANEL_INTENSITY: 100,
       ACTIVE_PERIMETER_INTENSITY: 100,
       INACTIVE_PERIMETER_INTENSITY: 50,
       PERIMETER_COLOR: "white",
@@ -134,24 +145,19 @@ export default class DefaultConfig {
         disk2: { [this.LIGHTS.DISK_LIGHT_STRIP]: '2' }
       },
       CONTROL_MAPPINGS: {
-        // stripId
-        [this.LIGHTS.STRIP_A]: {
-          // panelId -- diskId
-          '1': { disk0: Disk.COUNTERCLOCKWISE },
-          '2': { disk0: Disk.COUNTERCLOCKWISE },
-          '4': { disk1: Disk.COUNTERCLOCKWISE },
-          '5': { disk1: Disk.COUNTERCLOCKWISE },
-          '7': { disk2: Disk.COUNTERCLOCKWISE },
-          '8': { disk2: Disk.COUNTERCLOCKWISE }
+        CLOCKWISE_STRIP: this.LIGHTS.STRIP_C,
+        COUNTERCLOCKWISE_STRIP: this.LIGHTS.STRIP_A,
+
+        CLOCKWISE_PANELS: {
+          // diskId : [panelId1, ...]
+          disk0: ['1', '2'],
+          disk1: ['4', '5'],
+          disk2: ['7', '8']
         },
-        [this.LIGHTS.STRIP_C]: {
-          // panelId -- diskId
-          '1': { disk0: Disk.CLOCKWISE },
-          '2': { disk0: Disk.CLOCKWISE },
-          '4': { disk1: Disk.CLOCKWISE },
-          '5': { disk1: Disk.CLOCKWISE },
-          '7': { disk2: Disk.CLOCKWISE },
-          '8': { disk2: Disk.CLOCKWISE }
+        COUNTERCLOCKWISE_PANELS: {
+          disk0: ['1', '2'],
+          disk1: ['4', '5'],
+          disk2: ['7', '8']
         }
       }
     };
@@ -195,7 +201,7 @@ export default class DefaultConfig {
   }
 
   getUserColor(username) {
-    return this.USER_COLORS[username];
+    return this.COLORS.USERS[username];
   }
 }
 

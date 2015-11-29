@@ -44,14 +44,21 @@ export default class DiskGameLogic {
     this._setPerimeter(this._level, this.gameConfig.PERIMETER_COLOR, this.gameConfig.ACTIVE_PERIMETER_INTENSITY)
 
     // Activate UI indicators
-    for (let stripId of Object.keys(this.gameConfig.CONTROL_MAPPINGS)) {
-      const panels = this.gameConfig.CONTROL_MAPPINGS[stripId];
-      for (let panelId of Object.keys(panels)) {
-        this._lights.setIntensity(stripId, panelId, this.gameConfig.AVAILABLE_PANEL_INTENSITY);
+    const controlMappings = this.gameConfig.CONTROL_MAPPINGS;
+    //TODO: Clean this up
+    for (let diskId of Object.keys(controlMappings.CLOCKWISE_PANELS)) {
+      for (let panelId of controlMappings.CLOCKWISE_PANELS[diskId]) {
+        this._lights.setIntensity(controlMappings.CLOCKWISE_STRIP, panelId, this.gameConfig.CONTROL_PANEL_INTENSITY);
+      }
+    }
+    for (let diskId of Object.keys(controlMappings.COUNTERCLOCKWISE_PANELS)) {
+      for (let panelId of controlMappings.COUNTERCLOCKWISE_PANELS[diskId]) {
+        this._lights.setIntensity(controlMappings.COUNTERCLOCKWISE_STRIP, panelId, this.gameConfig.CONTROL_PANEL_INTENSITY);
       }
     }
   }
 
+  //TODO: These end() methods may be obsolete now since everything is reset before every game anyway
   end() {
     this.config.LIGHTS.GAME_STRIPS.forEach((id) => this._lights.setIntensity(id, null, 0));
     // Deactivate shadow lights
@@ -77,25 +84,66 @@ export default class DiskGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    let {stripId, panelId, pressed} = payload;
-
-    const controlMappings = this.gameConfig.CONTROL_MAPPINGS;
-    if (this._complete || !controlMappings.hasOwnProperty(stripId) || !controlMappings[stripId].hasOwnProperty(panelId)) {
+    //TODO: Break up this method
+    if (this._complete) {
       return;
     }
 
-    const disks = this.store.data.get('disks');
-    const targetDisks = controlMappings[stripId][panelId];
+    const controlMappings = this.gameConfig.CONTROL_MAPPINGS;
+    const {stripId, panelId, pressed} = payload;
+
+    let panels, direction;
+    if (stripId === controlMappings.CLOCKWISE_STRIP) {
+      panels = controlMappings.CLOCKWISE_PANELS;
+      direction = Disk.CLOCKWISE;
+    }
+    else if (stripId === controlMappings.COUNTERCLOCKWISE_STRIP) {
+      panels = controlMappings.COUNTERCLOCKWISE_PANELS;
+      direction = Disk.COUNTERCLOCKWISE;
+    }
+    else {
+      // just go with whatever default behaviour
+      return;
+    }
     
-    for (let diskId of Object.keys(targetDisks)) {
-      const direction = targetDisks[diskId];
-      const disk = disks.get(diskId);
-      if (pressed) {
-        disk.setDirection(direction);
+    let diskId = null, panelIds;
+    for (let panelsDiskId of Object.keys(panels)) {
+      panelIds = panels[panelsDiskId];
+      if (panelIds.includes(panelId)) {
+        diskId = panelsDiskId;
+        break;
       }
-      else if (!disk.isStopped) {
-        disk.unsetDirection(direction);
-      }
+    }
+
+    const lightArray = this._lights;
+    if (diskId === null) {
+      // Override the default behaviour and keep this panel off because
+      // it is still a special panel
+      // It just doesn't do anything
+      //TODO: Magic literal
+      lightArray.setIntensity(stripId, panelId, 0);
+      return;
+    }
+    const disks = this.store.data.get('disks');
+    const disk = disks.get(diskId);
+
+    const activePanels = panelIds.reduce((total, panelId) => {
+      return total + (lightArray.isActive(stripId, panelId) ? 1 : 0);
+    }, 0);
+
+    // Only need to activate/deactivate them once
+    if (activePanels === 1) {
+      this._activateDisk(diskId, direction, stripId, panelIds);
+    }
+    else if (activePanels === 0) {
+      this._deactivateDisk(diskId, direction, stripId, panelIds);
+    }
+
+    if (disk.isConflicting) {
+      this._setDiskControlsColor(diskId, this.config.COLORS.ERROR);
+    }
+    else {
+      this._setDiskControlsColor(diskId, this.store.userColor);
     }
   }
 
@@ -118,15 +166,15 @@ export default class DiskGameLogic {
     if (!this.store.isStatusSuccess) {
       // FIXME:
       // Instead of just checking for the win condition, we want to:
-      // o If Disk 0 or Disk 2 (the disks with the boundary part of the pattern) is in the 
+      // - If Disk 0 or Disk 2 (the disks with the boundary part of the pattern) is in the 
       //   correct location for a minimum amount of time, we trigger the Single Disk Success event
 
       // Single Disk Success Event
-      // o Play success sounds (AudioView)
-      // o UI LEDS and disk LED turns location color
-      // o If Disk 1 or 2, turn perimeter LED to location color
-      // o Lock this disk in position; disable any future interaction
-      // o From now on, allow Disk 1 to trigger a Single Disk Success Event
+      // - Play success sounds (AudioView)
+      // - UI LEDS and disk LED turns location color
+      // - If Disk 1 or 2, turn perimeter LED to location color
+      // - Lock this disk in position; disable any future interaction
+      // - From now on, allow Disk 1 to trigger a Single Disk Success Event
       this._checkWinConditions(disks);
     }
   }
@@ -137,10 +185,45 @@ export default class DiskGameLogic {
     }
   }
 
+  _activateDisk(diskId, direction, stripId, panelIds) {
+    const disks = this.store.data.get('disks');
+    const disk = disks.get(diskId);
+    disk.setDirection(direction);
+
+    panelIds.forEach((panelId) => {
+      this._lights.setIntensity(stripId, panelId, this.gameConfig.ACTIVE_CONTROL_PANEL_INTENSITY);
+      this._lights.setColor(stripId, panelId, this.store.userColor);
+    });
+  }
+
+  _deactivateDisk(diskId, direction, stripId, panelIds) {
+    const disks = this.store.data.get('disks');
+    const disk = disks.get(diskId);
+    disk.unsetDirection(direction);
+
+    panelIds.forEach((panelId) => {
+      //TODO: Only deactivate if both panels are inactive
+      this._lights.setIntensity(stripId, panelId, this.gameConfig.CONTROL_PANEL_INTENSITY);
+      this._lights.setDefaultColor(stripId, panelId);
+    });
+  }
+
+  _setDiskControlsColor(diskId, color) {
+    const controlMappings = this.gameConfig.CONTROL_MAPPINGS;
+
+    const lightArray = this._lights;
+    for (let panelId of controlMappings.CLOCKWISE_PANELS[diskId]) {
+      lightArray.setColor(controlMappings.CLOCKWISE_STRIP, panelId, color);
+    }
+    for (let panelId of controlMappings.COUNTERCLOCKWISE_PANELS[diskId]) {
+      lightArray.setColor(controlMappings.COUNTERCLOCKWISE_STRIP, panelId, color);
+    }
+  }
+
   /**
    * Win conditions:
-   * o The three disks needs to be _relatively_ aligned within RELATIVE_TOLERANCE
-   * o Any disk must be aligned within ABSOLUTE_TOLERANCE
+   * - The three disks needs to be _relatively_ aligned within RELATIVE_TOLERANCE
+   * - Any disk must be aligned within ABSOLUTE_TOLERANCE
    */
   _checkWinConditions(disks) {
     let prevDiskId = null;
@@ -167,6 +250,7 @@ export default class DiskGameLogic {
     this._winGame();
   }
 
+  //TODO: move this public method up
   /**
    * Current score (the total number of degrees away from solution).
    * For 3 disks, this will be between 0 and 540
