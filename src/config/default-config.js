@@ -109,8 +109,8 @@ export default class DefaultConfig {
 
     this.DISK_GAME = {
       // The user will wins when they reach these positions for each diskId.
-      RELATIVE_TOLERANCE: 3, // degrees tolerance for disks relative to each other
-      ABSOLUTE_TOLERANCE: 5, // degrees tolerance for the absolute disk positions
+      RELATIVE_TOLERANCE: 8, // degrees tolerance for disks relative to each other
+      ABSOLUTE_TOLERANCE: 8, // degrees tolerance for the absolute disk positions
       // The intensity of the panels that the user can use to play the sequence
       CONTROL_PANEL_INTENSITY: 20,
       ACTIVE_CONTROL_PANEL_INTENSITY: 100,
