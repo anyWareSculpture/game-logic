@@ -170,7 +170,8 @@ export default class DefaultConfig {
           stripId: this.LIGHTS.STRIP_A,
           // Each array of panel IDs is lit up one at a time
           // Each array within this array is called a "frame" in the "sequence"
-          panelSequence: [['3'], ['5'], ['7']]
+          panelSequence: [['3'], ['5'], ['7']],
+          frameDelay: 750 // Overriding default frame delay to make first level slower
         },
         // level 1 sequence
         {
