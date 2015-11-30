@@ -104,7 +104,8 @@ export default class DefaultConfig {
       // The intensity to use on the active panels
       INACTIVE_PANEL_INTENSITY: 0,
       // The intensity to use on the inactive panels (panels turned to location color)
-      COLORED_PANEL_INTENSITY: 75
+      COLORED_PANEL_INTENSITY: 75,
+      ENABLE_FAILURE_SOUND: false
     };
 
     this.DISK_GAME = {
