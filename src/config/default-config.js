@@ -127,15 +127,15 @@ export default class DefaultConfig {
         // level 0
         // disks: { diskId: target position }
         // perimeter: { stripId: [panelIds..] }
-        { disks:     { disk2: 203, disk1: 0, disk0: 175 },
+        { disks:     { disk2: 206, disk1: 0, disk0: 171 },
           perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2']  }
         },
         // level 1
-        { disks:     { disk2: 176,  disk1: 307, disk0: 348 },
+        { disks:     { disk2: 185,  disk1: 306, disk0: 346 },
           perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5']  }
         },
         // level 2
-        { disks:     { disk2: 337, disk1: 325,  disk0: 244 },
+        { disks:     { disk2: 335, disk1: 331,  disk0: 238 },
           perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4']  }
         }
       ],
