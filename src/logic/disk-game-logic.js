@@ -201,6 +201,13 @@ export default class DiskGameLogic {
   _deactivateDisk(diskId, direction, stripId, panelIds) {
     const disks = this.store.data.get('disks');
     const disk = disks.get(diskId);
+    if (disk.isStopped) {
+      // This fixes a bug where a user wins the level with their hand on the
+      // panel and then takes it off. We stop all the disks between levels so
+      // all the disks are already off when they let go. This can cause errors
+      //TODO: Determine if this check should actually be in Disk#unsetDirection
+      return;
+    }
     disk.unsetDirection(direction);
 
     panelIds.forEach((panelId) => {
