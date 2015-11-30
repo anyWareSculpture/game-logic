@@ -51,6 +51,10 @@ export default class SimonGameLogic {
     return this._complete;
   }
 
+  get currentStrip() {
+    return this._currentLevelData && this._currentLevelData.stripId;
+  }
+
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
