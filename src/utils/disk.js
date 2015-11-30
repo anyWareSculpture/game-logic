@@ -113,6 +113,14 @@ export default class Disk extends TrackedData {
     this.set('state', state);
   }
 
+  get isHoming() {
+    return this.getState() === Disk.STATE_HOMING;
+  }
+
+  get isReady() {
+    return this.getState() === Disk.STATE_READY;
+  }
+
   getState() {
     return this.get('state');
   }
