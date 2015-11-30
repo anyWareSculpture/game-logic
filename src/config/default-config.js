@@ -151,9 +151,9 @@ export default class DefaultConfig {
 
         CLOCKWISE_PANELS: {
           // diskId : [panelId1, ...]
-          disk0: ['1', '2'],
-          disk1: ['4', '5'],
-          disk2: ['7', '8']
+          disk0: ['1'],
+          disk1: ['3'],
+          disk2: ['5']
         },
         COUNTERCLOCKWISE_PANELS: {
           disk0: ['1', '2'],
