@@ -27,6 +27,20 @@ export default class Disk extends TrackedData {
   }
 
   /**
+   * Gets the ideal direction to turn to the given position
+   * from this disk's current position
+   */
+  directionTo(target) {
+    const position = this.getPosition();
+    if (Math.sign(target - position) > 0) {
+      return Disk.CLOCKWISE;
+    }
+    else {
+      return Disk.COUNTERCLOCKWISE;
+    }
+  }
+
+  /**
    * Applies the given direction to the disk, sometimes resulting in a conflict if direction opposes the current direction
    * @param {String} direction - Static direction constant from Disk
    */

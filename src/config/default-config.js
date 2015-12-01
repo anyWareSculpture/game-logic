@@ -110,14 +110,18 @@ export default class DefaultConfig {
 
     this.DISK_GAME = {
       // The user will wins when they reach these positions for each diskId.
-      RELATIVE_TOLERANCE: 8, // degrees tolerance for disks relative to each other
-      ABSOLUTE_TOLERANCE: 8, // degrees tolerance for the absolute disk positions
+      RELATIVE_TOLERANCE: 10, // degrees tolerance for disks relative to each other
+      ABSOLUTE_TOLERANCE: 10, // degrees tolerance for the absolute disk positions
       // The intensity of the panels that the user can use to play the sequence
       CONTROL_PANEL_INTENSITY: 20,
       ACTIVE_CONTROL_PANEL_INTENSITY: 100,
       ACTIVE_PERIMETER_INTENSITY: 100,
       INACTIVE_PERIMETER_INTENSITY: 50,
       PERIMETER_COLOR: "white",
+      // The distance to set the disks away from the solution so that
+      // when the disk game starts it can quickly move to the solution
+      // and then begin the game
+      TUTORIAL_DISTANCE: 30,
       SHADOW_LIGHTS: {
         // stripId: [panelId..]
         '6': ['0', '1', '2']

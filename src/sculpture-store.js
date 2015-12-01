@@ -227,6 +227,10 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _handleActionPayload(payload) {
+    //TODO: Add this back in and test it
+    //if (Object.keys(this.data.getChangedCurrentValues()).length) {
+    //  throw new Error("Changes detected outside of action");
+    //}
     if (this.isLocked && !this._actionCanRunWhenLocked(payload.actionType)) {
       return;
     }
@@ -344,7 +348,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _actionDiskUpdate(payload) {
-    let {diskId, position, direction, user} = payload;
+    let {diskId, position, direction, state} = payload;
 
     if (typeof diskId === 'undefined') {
       return;
@@ -360,8 +364,8 @@ export default class SculptureStore extends events.EventEmitter {
       disk.setDirection(direction);
     }
 
-    if (typeof user !== 'undefined' && user !== null) {
-      disk.setUser(user);
+    if (typeof state !== 'undefined' && state !== null) {
+      disk.setState(state);
     }
   }
 

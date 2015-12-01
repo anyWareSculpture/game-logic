@@ -23,6 +23,7 @@ export default class DisksActionCreator extends BaseActionCreator {
       payloadBody.state = state;
     }
 
+    //TODO: indicate whether an action was really sent
     if (Object.keys(payloadBody).length > 0) {
       payloadBody.diskId = diskId;
 
