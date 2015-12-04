@@ -241,13 +241,15 @@ export default class DiskGameLogic {
       const diskPos = currDisk.getPosition();
 
       // Check position relative to neighbor disk
-      if (prevDiskId) {
-        if (Math.abs((targetPos - this._targetPositions[prevDiskId]) -
-                     (diskPos - disks.get(prevDiskId).getPosition())) > 
-                     this.gameConfig.RELATIVE_TOLERANCE) {
-          return false;
-        }
-      }
+// FIXME: We disabled this for now, as relative tolerance only makes sense
+// if we have better disk precision than the tolerance.
+//      if (prevDiskId) {
+//        if (Math.abs((targetPos - this._targetPositions[prevDiskId]) -
+//                     (diskPos - disks.get(prevDiskId).getPosition())) > 
+//                     this.gameConfig.RELATIVE_TOLERANCE) {
+//          return false;
+//        }
+//      }
       // Check absolute position
       const d = Math.abs(diskPos - targetPos) % 360;
       const r =  d > 180 ? 360 - d : d;
