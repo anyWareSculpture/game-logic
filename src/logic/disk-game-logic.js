@@ -249,7 +249,10 @@ export default class DiskGameLogic {
         }
       }
       // Check absolute position
-      if (Math.abs(diskPos - targetPos) > this.gameConfig.ABSOLUTE_TOLERANCE) {
+      const d = Math.abs(diskPos - targetPos) % 360;
+      const r =  d > 180 ? 360 - d : d;
+      console.debug(`${diskId} error: ${r}`);
+      if (Math.abs(r) > this.gameConfig.ABSOLUTE_TOLERANCE) {
         return false;
       }
       prevDiskId = diskId;
