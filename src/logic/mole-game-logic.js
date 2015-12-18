@@ -1,9 +1,7 @@
-const assert = require('assert');
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const SculptureActionCreator = require('../actions/sculpture-action-creator');
 const MoleGameActionCreator = require('../actions/mole-game-action-creator');
-const {TrackedPanels, PanelSet} = require('../utils/panel-group');
-const TrackedSet = require('../utils/tracked-set');
+const {TrackedPanels} = require('../utils/panel-group');
 
 export default class MoleGameLogic {
   // These are automatically added to the sculpture store
@@ -16,7 +14,7 @@ export default class MoleGameLogic {
     this.store = store;
     this.config = config;
     this.gameConfig = config.MOLE_GAME;
-    
+
     this._complete = false;
 
     // _remainingPanels are used to select random panels
@@ -42,7 +40,7 @@ export default class MoleGameLogic {
   start() {
     this._complete = false;
     this.data.set('panelCount', 0);
-    this.data.set('panels', new TrackedPanels);
+    this.data.set('panels', new TrackedPanels());
     this._registerTimeout(0);
   }
 
@@ -128,7 +126,7 @@ export default class MoleGameLogic {
 
       // Advance game
       let panelCount = this.data.get("panelCount") + 1;
-      if (panelCount == 29) { // FIXME: Make game end configurable
+      if (panelCount === 29) { // FIXME: Make game end configurable
         this._winGame();
       }
       else {
@@ -136,7 +134,7 @@ export default class MoleGameLogic {
         // Determine whether to add, remove of keep # of simultaneous panels
         const addPanels = 1 + (this.gameConfig.NUM_ACTIVE_PANELS[panelCount] ? this.gameConfig.NUM_ACTIVE_PANELS[panelCount] : 0);
 
-        for (let i=0;i<addPanels;i++) {
+        for (let i=0; i<addPanels; i++) {
           this._registerTimeout(this.gameConfig.PANEL_SUCCESS_DELAY); // Wait before next panel
         }
       }
@@ -171,7 +169,7 @@ export default class MoleGameLogic {
     const idx = Math.floor(Math.random() * this._remainingPanels.size);
     const iter = this._remainingPanels.values();
     let curr = iter.next();
-    for (let i=0;i<idx;i++) curr = iter.next();
+    for (let i=0; i<idx; i++) curr = iter.next();
     return curr.value;
   }
 
@@ -235,13 +233,13 @@ export default class MoleGameLogic {
     this._setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_OFF);
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.INACTIVE_PANEL_INTENSITY);
   }
-  
+
   _colorPanel(panel) {
     this._setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_IGNORED);
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.COLORED_PANEL_INTENSITY);
     this._lights.setColor(panel.stripId, panel.panelId, this.store.userColor);
   }
-  
+
   _winGame() {
     this._lights.deactivateAll();
     this.store.setSuccessStatus();

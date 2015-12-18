@@ -1,6 +1,6 @@
 /**
  * Default Configuration
- * 
+ *
  * Extend the class exported from this module to create your own local
  * configuration objects or use this directly.
  * A configuration file is any ES6 file that exports a single default
@@ -9,14 +9,12 @@
  * Avoid requiring this file into any file that might need this one.
  * In general game logic should never need this, a config object should
  * be passed around through constructors.
- * 
+ *
  * Try to keep the structure as flat as possible while grouping things logically
  */
 
 const COLORS = require('../constants/colors');
 const GAMES = require('../constants/games');
-
-const Disk = require('../utils/disk');
 
 export default class DefaultConfig {
   constructor({
@@ -51,7 +49,7 @@ export default class DefaultConfig {
       GAMES.SIMON
     ];
 
-    /******* LIGHTS ********************/
+    /******* LIGHTS  ********************/
     this.LIGHTS = {
       STRIP_A: '0',
       STRIP_B: '1',
@@ -60,11 +58,11 @@ export default class DefaultConfig {
       DISK_LIGHT_STRIP: '4',
       HANDSHAKE_STRIP: '5',
       ART_LIGHTS_STRIP: '6'
-    }
+    };
     this.LIGHTS.GAME_STRIPS = [
       this.LIGHTS.STRIP_A,
       this.LIGHTS.STRIP_B,
-      this.LIGHTS.STRIP_C,
+      this.LIGHTS.STRIP_C
     ];
 
     // These settings effect the default behaviour of panels outside of
@@ -78,7 +76,7 @@ export default class DefaultConfig {
 
     this.HANDSHAKE_GAME = {
       TRANSITION_OUT_TIME: 4000
-    },
+    };
     this.MOLE_GAME = {
       INITIAL_PANELS: [
         {stripId: this.LIGHTS.STRIP_A, panelId: '3'},
@@ -127,16 +125,16 @@ export default class DefaultConfig {
         // level 0
         // disks: { diskId: target position }
         // perimeter: { stripId: [panelIds..] }
-        { disks:     { disk2: 206, disk1: 0, disk0: 171 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2']  }
+        { disks:     { disk2: 206, disk1: 0, disk0: 170 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2'] }
         },
         // level 1
-        { disks:     { disk2: 185,  disk1: 306, disk0: 346 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5']  }
+        { disks:     { disk2: 180, disk1: 305, disk0: 346 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5'] }
         },
         // level 2
-        { disks:     { disk2: 335, disk1: 331,  disk0: 238 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4']  }
+        { disks:     { disk2: 330, disk1: 330, disk0: 242 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4'] }
         }
       ],
       LIGHT_MAPPING: {

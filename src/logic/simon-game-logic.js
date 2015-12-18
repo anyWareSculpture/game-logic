@@ -152,7 +152,7 @@ export default class SimonGameLogic {
   _winLevel() {
     this.store.data.get('lights').deactivateAll();
     this._lights.setIntensity(this._currentLevelData.stripId, null, 0);
-    
+
     this.store.setSuccessStatus();
 
     let level = this._level + 1;

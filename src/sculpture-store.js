@@ -101,7 +101,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
-   * 
+   *
    */
   get userColor() {
     return this.config.getUserColor(this.config.username);
@@ -306,7 +306,7 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionAnimationFrame(payload) {
     const {callback} = payload;
-    
+
     callback();
   }
 
@@ -380,7 +380,7 @@ export default class SculptureStore extends events.EventEmitter {
           lightArray.setIntensity(stripId, panelId, panelChanges.intensity);
         }
         if (panelChanges.hasOwnProperty("active")) {
-          //TODO: Set color based on metadata
+          // TODO: Set color based on metadata
           lightArray.activate(stripId, panelId, panelChanges.active);
         }
       }
@@ -388,7 +388,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _mergeDisks(diskChanges) {
-    //TODO
+    // TODO
     console.log(diskChanges);
   }
 
