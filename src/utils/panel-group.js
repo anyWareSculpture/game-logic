@@ -19,8 +19,8 @@ export class TrackedPanels extends TrackedData {
   }
 
   get numPanels() {
-    return Object.keys(_this.data).length;
-  } 
+    return Object.keys(this._data).length;
+  }
 
   _hash(stripId, panelId) {
     return `${stripId},${panelId}`;
