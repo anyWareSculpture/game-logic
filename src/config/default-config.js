@@ -78,6 +78,7 @@ export default class DefaultConfig {
       TRANSITION_OUT_TIME: 4000
     };
     this.MOLE_GAME = {
+      GAME_END: 30,
       INITIAL_PANELS: [
         {stripId: this.LIGHTS.STRIP_A, panelId: '3'},
         {stripId: this.LIGHTS.STRIP_A, panelId: '7'},
@@ -98,6 +99,8 @@ export default class DefaultConfig {
       ],
       // How long to wait before enabling the next panel, on success
       PANEL_SUCCESS_DELAY: 1000,
+      // How long to wait before enabling the next panel, on automatic panel move
+      PANEL_MOVE_DELAY: 200,
       // The intensity to use on active panels
       ACTIVE_PANEL_INTENSITY: 100,
       // The intensity to use on inactive panels

@@ -41,7 +41,7 @@ export default class MoleGameLogic {
     this._complete = false;
     this.data.set('panelCount', 0);
     this.data.set('panels', new TrackedPanels());
-    this._registerTimeout(0);
+    this._registerTimeout(0); // Request a new active panel immediately
   }
 
   end() {
@@ -72,7 +72,7 @@ export default class MoleGameLogic {
    */
   _actionFinishStatusAnimation(payload) {
     this._complete = true;
-    // There is no transition out, so we can synchronously start the next game
+    // There is currently no transition out, so we can synchronously start the next game
     this.store.moveToNextGame();
   }
 
@@ -126,7 +126,7 @@ export default class MoleGameLogic {
 
       // Advance game
       let panelCount = this.data.get("panelCount") + 1;
-      if (panelCount === 29) { // FIXME: Make game end configurable
+      if (panelCount === this.gameConfig.GAME_END) {
         this._winGame();
       }
       else {
@@ -203,7 +203,7 @@ export default class MoleGameLogic {
       const key = this._getPanelKey(oldPanel);
       delete this._activeTimeouts[key];
       this.moleGameActionCreator.sendDeactivatePanel(oldPanel);
-      this._registerTimeout(200); // Turn on a new panel after 200ms. FIXME: Make time configurable
+      this._registerTimeout(this.gameConfig.PANEL_MOVE_DELAY);
     }
     else {
       const {panel, lifetime} = this._nextActivePanel(this.data.get("panelCount"));
@@ -223,19 +223,19 @@ export default class MoleGameLogic {
 
   // FIXME: The panel should also pulse. Should the pulsating state be part of tracked data, or should each view deduce this from the current game and state?
   _activatePanel(panel) {
-    this._setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_ON);
+    this._setPanelState(panel, TrackedPanels.STATE_ON);
     this._remainingPanels.delete(this._getPanel(panel));
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.ACTIVE_PANEL_INTENSITY);
   }
 
   _deactivatePanel(panel) {
     this._remainingPanels.add(this._getPanel(panel));
-    this._setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_OFF);
+    this._setPanelState(panel, TrackedPanels.STATE_OFF);
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.INACTIVE_PANEL_INTENSITY);
   }
 
   _colorPanel(panel) {
-    this._setPanelState(panel.stripId, panel.panelId, TrackedPanels.STATE_IGNORED);
+    this._setPanelState(panel, TrackedPanels.STATE_IGNORED);
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.COLORED_PANEL_INTENSITY);
     this._lights.setColor(panel.stripId, panel.panelId, this.store.userColor);
   }
@@ -249,7 +249,7 @@ export default class MoleGameLogic {
     return this.store.data.get('lights');
   }
 
-  _setPanelState(stripId, panelId, state) {
+  _setPanelState({stripId, panelId}, state) {
     this.data.get('panels').setPanelState(stripId, panelId, state);
   }
 
