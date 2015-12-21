@@ -330,17 +330,6 @@ export default class SculptureStore extends events.EventEmitter {
     const lightArray = this.data.get('lights');
     const {stripId, panelId, pressed} = payload;
     lightArray.activate(stripId, panelId, pressed);
-    // This is a reasonable default behaviour that can be overridden in
-    // a game logic class if necessary
-    // FIXME: Disabled default behavior as it triggered too many issues in the mole and simon games
-//    if (pressed) {
-//      lightArray.setColor(stripId, panelId, this.userColor);
-//      lightArray.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.ACTIVE_INTENSITY);
-//    }
-//    else {
-//      lightArray.setDefaultColor(stripId, panelId);
-//      lightArray.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.INACTIVE_INTENSITY);
-//    }
   }
 
   _actionDiskUpdate(payload) {
