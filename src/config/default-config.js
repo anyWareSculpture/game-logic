@@ -96,13 +96,15 @@ export default class DefaultConfig {
         {count: 20, range: [2, 3]},
         {count: 30, range: [1.5, 2]}
       ],
+      // How long to wait before enabling the next panel, on success
       PANEL_SUCCESS_DELAY: 1000,
-      // The intensity to use on the active panels
+      // The intensity to use on active panels
       ACTIVE_PANEL_INTENSITY: 100,
-      // The intensity to use on the active panels
+      // The intensity to use on inactive panels
       INACTIVE_PANEL_INTENSITY: 0,
-      // The intensity to use on the inactive panels (panels turned to location color)
+      // The intensity to use on ignored panels (panels turned to location color)
       COLORED_PANEL_INTENSITY: 75,
+      // We don't use failure sounds in the default setup due to too many accidental touches
       ENABLE_FAILURE_SOUND: false
     };
 
@@ -114,7 +116,7 @@ export default class DefaultConfig {
       CONTROL_PANEL_INTENSITY: 20,
       ACTIVE_CONTROL_PANEL_INTENSITY: 100,
       ACTIVE_PERIMETER_INTENSITY: 100,
-      INACTIVE_PERIMETER_INTENSITY: 50,
+      INACTIVE_PERIMETER_INTENSITY: 50, // Inactive: when turned to location color
       PERIMETER_COLOR: "white",
       SHADOW_LIGHTS: {
         // stripId: [panelId..]
