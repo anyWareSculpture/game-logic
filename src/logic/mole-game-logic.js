@@ -1,7 +1,7 @@
 const PanelsActionCreator = require('../actions/panels-action-creator');
 const SculptureActionCreator = require('../actions/sculpture-action-creator');
 const MoleGameActionCreator = require('../actions/mole-game-action-creator');
-const {TrackedPanels} = require('../utils/panel-group');
+const {TrackedPanels} = require('../utils/tracked-panels');
 
 export default class MoleGameLogic {
   // These are automatically added to the sculpture store
