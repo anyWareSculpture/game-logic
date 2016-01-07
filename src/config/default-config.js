@@ -75,7 +75,7 @@ export default class DefaultConfig {
     /******* GAMES CONFIGURATION *******/
 
     this.HANDSHAKE_GAME = {
-      TRANSITION_OUT_TIME: 4000
+      TRANSITION_OUT_TIME: 4000 // Time (ms) from handshake is touched until we start the next game
     };
     this.MOLE_GAME = {
       GAME_END: 30,

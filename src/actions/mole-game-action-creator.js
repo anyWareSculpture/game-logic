@@ -2,20 +2,20 @@ const BaseActionCreator = require('./base-action-creator');
 
 export default class MoleGameActionCreator extends BaseActionCreator {
   // Action types
-  static ACTIVATE_PANEL = "activate-panel";
-  static DEACTIVATE_PANEL = "deactivate-panel";
+  static AVAIL_PANEL = "avail-panel";
+  static DEAVAIL_PANEL = "deavail-panel";
 
   /**
-   * Signals the mole game to activate a panel, typically from a timer
+   * Signals the mole game to avail a panel, typically from a timer
    */
-  sendActivatePanel({stripId, panelId}) {
-    this._dispatch(MoleGameActionCreator.ACTIVATE_PANEL, {stripId, panelId});
+  sendAvailPanel({stripId, panelId}) {
+    this._dispatch(MoleGameActionCreator.AVAIL_PANEL, {stripId, panelId});
   }
 
   /**
-   * Signals the mole game to deactivate a panel, typically from a timer
+   * Signals the mole game to deavail a panel, typically from a timer
    */
-  sendDeactivatePanel({stripId, panelId}) {
-    this._dispatch(MoleGameActionCreator.DEACTIVATE_PANEL, {stripId, panelId});
+  sendDeavailPanel({stripId, panelId}) {
+    this._dispatch(MoleGameActionCreator.DEAVAIL_PANEL, {stripId, panelId});
   }
 }

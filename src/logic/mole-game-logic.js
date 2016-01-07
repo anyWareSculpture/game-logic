@@ -58,8 +58,8 @@ export default class MoleGameLogic {
 
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
-      [MoleGameActionCreator.ACTIVATE_PANEL]: this._actionActivatePanel.bind(this),
-      [MoleGameActionCreator.DEACTIVATE_PANEL]: this._actionDeactivatePanel.bind(this),
+      [MoleGameActionCreator.AVAIL_PANEL]: this._actionAvailPanel.bind(this),
+      [MoleGameActionCreator.DEAVAIL_PANEL]: this._actionDeavailPanel.bind(this),
       [SculptureActionCreator.FINISH_STATUS_ANIMATION]: this._actionFinishStatusAnimation.bind(this)
     };
 
@@ -79,22 +79,22 @@ export default class MoleGameLogic {
   /**
    * Asynchronous panel activation
    */
-  _actionActivatePanel(panel) {
-    this._activatePanel(panel);
+  _actionAvailPanel(panel) {
+    this._availPanel(panel);
   }
 
   /**
    * Asynchronous panel deactivation
    */
-  _actionDeactivatePanel(panel) {
-    this._deactivatePanel(panel);
+  _actionDeavailPanel(panel) {
+    this._deavailPanel(panel);
   }
 
   /**
    * If an active panel is pressed:
    * 1) Turn panel to location color
    * 2) Wait a short moment
-   * 3) Activate the next panel
+   * 3) Avail the next panel
    * 4) increase/decrease # of simulaneously active panels
    */
   _actionPanelPressed(payload) {
@@ -195,19 +195,19 @@ export default class MoleGameLogic {
   }
 
   /**
-   * If called with a panel, we'll move the panel (deactivate+pause+activate).
-   * If called without a panel we'll immediately activate a new panel
+   * If called with a panel, we'll move the panel (deavail+pause+avail).
+   * If called without a panel we'll immediately avail a new panel
    */
   _panelTimeout(oldPanel) {
     if (oldPanel) {
       const key = this._getPanelKey(oldPanel);
       delete this._activeTimeouts[key];
-      this.moleGameActionCreator.sendDeactivatePanel(oldPanel);
+      this.moleGameActionCreator.sendDeavailPanel(oldPanel);
       this._registerTimeout(this.gameConfig.PANEL_MOVE_DELAY);
     }
     else {
       const {panel, lifetime} = this._nextActivePanel(this.data.get("panelCount"));
-      this.moleGameActionCreator.sendActivatePanel(panel);
+      this.moleGameActionCreator.sendAvailPanel(panel);
       this._registerTimeout(lifetime, panel);
     }
   }
@@ -222,13 +222,13 @@ export default class MoleGameLogic {
   }
 
   // FIXME: The panel should also pulse. Should the pulsating state be part of tracked data, or should each view deduce this from the current game and state?
-  _activatePanel(panel) {
+  _availPanel(panel) {
     this._setPanelState(panel, TrackedPanels.STATE_ON);
     this._remainingPanels.delete(this._getPanel(panel));
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.ACTIVE_PANEL_INTENSITY);
   }
 
-  _deactivatePanel(panel) {
+  _deavailPanel(panel) {
     this._remainingPanels.add(this._getPanel(panel));
     this._setPanelState(panel, TrackedPanels.STATE_OFF);
     this._lights.setIntensity(panel.stripId, panel.panelId, this.gameConfig.INACTIVE_PANEL_INTENSITY);
