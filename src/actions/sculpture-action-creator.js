@@ -6,6 +6,7 @@ export default class SculptureActionCreator extends BaseActionCreator {
   // Action types
   static MERGE_STATE = "merge-state";
   static START_GAME = "start-game";
+  static START_NEXT_GAME = "start-next-game";
   static RESTORE_STATUS = "restore-status";
   static ANIMATION_FRAME = "animation-frame";
   static FINISH_STATUS_ANIMATION = "finish-status-animation";
@@ -24,6 +25,10 @@ export default class SculptureActionCreator extends BaseActionCreator {
     this._dispatch(SculptureActionCreator.START_GAME, {
       game: game
     });
+  }
+
+  sendStartNextGame(game) {
+    this._dispatch(SculptureActionCreator.START_NEXT_GAME);
   }
 
   sendStartMoleGame() {

@@ -27,6 +27,6 @@ export default class NormalizeStripFrame {
     this.lightArray.setColor(this.stripId, null, this.color);
     this.lightArray.setIntensity(this.stripId, null, this.intensity);
 
-    this.runMethod();   
+    this.runMethod();
   }
 }

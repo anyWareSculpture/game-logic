@@ -101,10 +101,10 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   /**
-   * 
+   *
    */
   get userColor() {
-    return this.config.USER_COLORS[this.config.username];
+    return this.config.getUserColor(this.config.username);
   }
 
   /**
@@ -178,9 +178,7 @@ export default class SculptureStore extends events.EventEmitter {
    * Starts the next game in the game sequence
    */
   moveToNextGame() {
-    const nextGame = this._getNextGame();
-
-    this._startGame(nextGame);
+    this._startGame(this._getNextGame());
   }
 
   _startGame(game) {
@@ -199,10 +197,19 @@ export default class SculptureStore extends events.EventEmitter {
     if (this.currentGameLogic) {
       this.currentGameLogic.end();
     }
+    this._resetGamePanels();
 
     this.data.set('currentGame', game);
     this.currentGameLogic = new GameLogic(this, this.config);
     this.currentGameLogic.start();
+  }
+
+  _resetGamePanels() {
+    const lightArray = this.data.get('lights');
+    this.config.LIGHTS.GAME_STRIPS.forEach((stripId) => {
+      lightArray.setDefaultColor(stripId);
+      lightArray.setDefaultIntensity(stripId);
+    });
   }
 
   _publishChanges() {
@@ -243,6 +250,7 @@ export default class SculptureStore extends events.EventEmitter {
   _delegateAction(payload) {
     const actionHandlers = {
       [SculptureActionCreator.START_GAME]: this._actionStartGame.bind(this),
+      [SculptureActionCreator.START_NEXT_GAME]: this._actionStartNextGame.bind(this),
       [SculptureActionCreator.MERGE_STATE]: this._actionMergeState.bind(this),
       [SculptureActionCreator.RESTORE_STATUS]: this._actionRestoreStatus.bind(this),
       [SculptureActionCreator.ANIMATION_FRAME]: this._actionAnimationFrame.bind(this),
@@ -266,6 +274,10 @@ export default class SculptureStore extends events.EventEmitter {
     }
 
     this._startGame(game);
+  }
+
+  _actionStartNextGame() {
+    this.moveToNextGame();
   }
 
   _actionMergeState(payload) {
@@ -294,7 +306,7 @@ export default class SculptureStore extends events.EventEmitter {
 
   _actionAnimationFrame(payload) {
     const {callback} = payload;
-    
+
     callback();
   }
 
@@ -315,8 +327,9 @@ export default class SculptureStore extends events.EventEmitter {
       return;
     }
 
+    const lightArray = this.data.get('lights');
     const {stripId, panelId, pressed} = payload;
-    this.data.get('lights').activate(stripId, panelId, pressed);
+    lightArray.activate(stripId, panelId, pressed);
   }
 
   _actionDiskUpdate(payload) {
@@ -356,7 +369,7 @@ export default class SculptureStore extends events.EventEmitter {
           lightArray.setIntensity(stripId, panelId, panelChanges.intensity);
         }
         if (panelChanges.hasOwnProperty("active")) {
-          //TODO: Set color based on metadata
+          // TODO: Set color based on metadata
           lightArray.activate(stripId, panelId, panelChanges.active);
         }
       }
@@ -364,7 +377,7 @@ export default class SculptureStore extends events.EventEmitter {
   }
 
   _mergeDisks(diskChanges) {
-    //TODO
+    // TODO
     console.log(diskChanges);
   }
 

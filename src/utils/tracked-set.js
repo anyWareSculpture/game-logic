@@ -3,7 +3,7 @@ const TrackedData = require('./tracked-data');
 /**
  * Implements a sub-set of the JavaScript Set API including adding,
  * removing and checking for item existence.
- * 
+ *
  * Tracks changes made to the set
  */
 export default class TrackedSet extends TrackedData {

@@ -49,7 +49,7 @@ export default class PanelAnimation {
     this.before();
     this.state = PanelAnimation.RUNNING;
     this.sculptureActionCreator = new SculptureActionCreator(dispatcher);
-    
+
     this.playNextFrame();
   }
 
@@ -67,8 +67,8 @@ export default class PanelAnimation {
    * Usually it isn't necessary to override this
    */
   playNextFrame() {
-    this.currentFrame++;
-    
+    this.currentFrame = this.currentFrame + 1;
+
     if (this.currentFrame >= this.frames.length || this.isStopped) {
       this.executeAsAction(() => this.after());
     }

@@ -18,6 +18,7 @@ export default class SimonGameLogic {
     this.gameConfig = this.config.SIMON_GAME;
 
     this.simonGameActionCreator = new SimonGameActionCreator(this.store.dispatcher);
+    this.sculptureActionCreator = new SculptureActionCreator(this.store.dispatcher);
 
     this._targetSequenceIndex = 0;
     this._targetSequence = null;
@@ -46,6 +47,14 @@ export default class SimonGameLogic {
     this.config.LIGHTS.GAME_STRIPS.forEach((id) => lights.setIntensity(id, null, 0));
   }
 
+  get complete() {
+    return this._complete;
+  }
+
+  get currentStrip() {
+    return this._currentLevelData && this._currentLevelData.stripId;
+  }
+
   handleActionPayload(payload) {
     const actionHandlers = {
       [PanelsActionCreator.PANEL_PRESSED]: this._actionPanelPressed.bind(this),
@@ -67,7 +76,7 @@ export default class SimonGameLogic {
 
   _actionFinishStatusAnimation(payload) {
     if (this._complete) {
-      this.store.moveToNextGame();
+      setTimeout(() => this.sculptureActionCreator.sendStartNextGame(), this.gameConfig.TRANSITION_OUT_TIME);
     }
     else {
       this._playCurrentSequence();
@@ -75,12 +84,22 @@ export default class SimonGameLogic {
   }
 
   _actionPanelPressed(payload) {
-    if (this._complete || !this.isReadyAndNotAnimating) {
+    if (this._complete || !this.store.isReady) {
       return;
     }
 
     const {stripId, panelId, pressed} = payload;
     const {stripId: targetStripId, panelSequence} = this._currentLevelData;
+
+    if (pressed) {
+      this._lights.setColor(stripId, panelId, this.userColor);
+      this._lights.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.ACTIVE_INTENSITY);
+    }
+    else {
+      this._lights.setDefaultColor(stripId, panelId);
+      this._lights.setIntensity(stripId, panelId, this.config.PANEL_DEFAULTS.INACTIVE_INTENSITY);
+    }
+
 
     const panelUp = !pressed;
     if (!panelUp || targetStripId !== stripId) {
@@ -133,7 +152,7 @@ export default class SimonGameLogic {
   _winLevel() {
     this.store.data.get('lights').deactivateAll();
     this._lights.setIntensity(this._currentLevelData.stripId, null, 0);
-    
+
     this.store.setSuccessStatus();
 
     let level = this._level + 1;
@@ -145,23 +164,23 @@ export default class SimonGameLogic {
   }
 
   _playCurrentSequence() {
-    const {stripId, panelSequence} = this._currentLevelData;
+    const {stripId, panelSequence, frameDelay} = this._currentLevelData;
 
-    this._playSequence(stripId, panelSequence);
+    this._playSequence(stripId, panelSequence, frameDelay);
   }
 
-  _playSequence(stripId, panelSequence) {
+  _playSequence(stripId, panelSequence, frameDelay) {
     this._discardInput();
 
-    const frames = panelSequence.map((panelIds) => this._createSequenceFrame(stripId, panelIds));
-    frames.push(this._createLastSequenceFrame(stripId));
+    const frames = panelSequence.map((panelIds) => this._createSequenceFrame(stripId, panelIds, frameDelay));
+    frames.push(this._createLastSequenceFrame(stripId, frameDelay));
     const animation = new PanelAnimation(frames, this._finishPlaySequence.bind(this));
 
     this.store.playAnimation(animation);
   }
 
-  _createSequenceFrame(stripId, panelIds) {
-    return this._createFrame(stripId, () => {
+  _createSequenceFrame(stripId, panelIds, frameDelay) {
+    return this._createFrame(stripId, frameDelay, () => {
       for (let panelId of panelIds) {
         this._lights.setIntensity(stripId, panelId, this.gameConfig.TARGET_PANEL_INTENSITY);
         this._lights.setColor(stripId, panelId, this.gameConfig.DEFAULT_SIMON_PANEL_COLOR);
@@ -169,16 +188,16 @@ export default class SimonGameLogic {
     });
   }
 
-  _createLastSequenceFrame(stripId) {
-    return this._createFrame(stripId, () => {});
+  _createLastSequenceFrame(stripId, frameDelay) {
+    return this._createFrame(stripId, frameDelay, () => {});
   }
 
-  _createFrame(stripId, callback) {
+  _createFrame(stripId, frameDelay, callback) {
     return new NormalizeStripFrame(this._lights, stripId,
       this.gameConfig.DEFAULT_SIMON_PANEL_COLOR,
       this.gameConfig.AVAILABLE_PANEL_INTENSITY,
       callback,
-      this.gameConfig.SEQUENCE_ANIMATION_FRAME_DELAY);
+      frameDelay !== undefined ? frameDelay : this.gameConfig.SEQUENCE_ANIMATION_FRAME_DELAY);
   }
 
   _finishPlaySequence() {

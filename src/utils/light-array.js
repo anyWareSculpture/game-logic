@@ -30,6 +30,9 @@ export default class LightArray extends TrackedData {
     super(properties);
 
     this.stripIds = Object.keys(stripLengths);
+
+    this.defaultIntensity = defaultIntensity;
+    this.defaultColor = defaultColor;
   }
 
   setMaxIntensity(intensity, stripId=null) {
@@ -49,6 +52,10 @@ export default class LightArray extends TrackedData {
     return this.get(stripId).get("panels").get(panelId);
   }
 
+  setDefaultColor(stripId, panelId) {
+    return this.setColor(stripId, panelId, this.defaultColor);
+  }
+
   setColor(stripId, panelId, color) {
     this._applyToOnePanelOrAll((panel) => panel.set("color", color), stripId, panelId);
   }
@@ -63,6 +70,10 @@ export default class LightArray extends TrackedData {
     const panel = this.getPanel(stripId, panelId);
 
     return panel.get("intensity");
+  }
+
+  setDefaultIntensity(stripId, panelId) {
+    return this.setIntensity(stripId, panelId, this.defaultIntensity);
   }
 
   setIntensity(stripId, panelId, intensity) {

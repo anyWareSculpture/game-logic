@@ -35,6 +35,10 @@ export default class Disk extends TrackedData {
     if (Disk.conflictsWith(currentDirection, direction)) {
       this.setDirectionConflict();
     }
+    else if (direction !== Disk.STOPPED && currentDirection === Disk.CONFLICT) {
+      // No other direction can be set while conflicting except for stop
+      return;
+    }
     else {
       this.set('direction', direction);
     }
@@ -54,7 +58,7 @@ export default class Disk extends TrackedData {
     }
     else if (currentDirection === Disk.CONFLICT) {
       const opposite = Disk.oppositeDirection(direction);
-      this.setDirection(opposite);
+      this.set('direction', opposite);
     }
     else {
       throw new Error(`Could not reason about how to unset direction '${direction}' from current direction '${currentDirection}'`);
@@ -107,6 +111,14 @@ export default class Disk extends TrackedData {
 
   setState(state) {
     this.set('state', state);
+  }
+
+  get isHoming() {
+    return this.getState() === Disk.STATE_HOMING;
+  }
+
+  get isReady() {
+    return this.getState() === Disk.STATE_READY;
   }
 
   getState() {
