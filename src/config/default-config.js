@@ -51,6 +51,7 @@ export default class DefaultConfig {
 
     /******* LIGHTS  ********************/
     this.LIGHTS = {
+      // Name : strip Id (corresponds to hardware)
       STRIP_A: '0',
       STRIP_B: '1',
       STRIP_C: '2',
@@ -64,6 +65,12 @@ export default class DefaultConfig {
       this.LIGHTS.STRIP_B,
       this.LIGHTS.STRIP_C
     ];
+    this.PANELS = {
+      // stripId : [all associated panel Ids]
+      [this.LIGHTS.STRIP_A]: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      [this.LIGHTS.STRIP_B]: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'],
+      [this.LIGHTS.STRIP_C]: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    };
 
     // These settings effect the default behaviour of panels outside of
     // any custom logic in any of the games
