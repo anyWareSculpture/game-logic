@@ -120,7 +120,7 @@ export default class DefaultConfig {
 
     this.DISK_GAME = {
       // The user will wins when they reach these positions for each diskId.
-      RELATIVE_TOLERANCE: 8, // degrees tolerance for disks relative to each other
+      RELATIVE_TOLERANCE: 5, // degrees tolerance for disks relative to each other
       ABSOLUTE_TOLERANCE: 8, // degrees tolerance for the absolute disk positions
       // The intensity of the panels that the user can use to play the sequence
       CONTROL_PANEL_INTENSITY: 20,
@@ -137,16 +137,16 @@ export default class DefaultConfig {
         // level 0
         // disks: { diskId: target position }
         // perimeter: { stripId: [panelIds..] }
-        { disks:     { disk2: 206, disk1: 0, disk0: 170 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '2'] }
+        { disks:     { disk2: 52, disk1: 317, disk0: 316 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['0', '4'] }
         },
         // level 1
-        { disks:     { disk2: 180, disk1: 305, disk0: 346 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['3', '5'] }
+        { disks:     { disk2: 66, disk1: 287, disk0: 308 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '3'] }
         },
         // level 2
-        { disks:     { disk2: 330, disk1: 330, disk0: 242 },
-          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['1', '4'] }
+        { disks:     { disk2: 286, disk1: 335, disk0: 240 },
+          perimeter: { [this.LIGHTS.PERIMETER_STRIP]: ['2', '5'] }
         }
       ],
       LIGHT_MAPPING: {
